@@ -10,8 +10,6 @@
  * 
  */
 UCLASS()
-class UNREALPROJECT_API APlayerUnit : public ABaseCharacter
-{
+class UNREALPROJECT_API APlayerUnit : public ABaseCharacter {
 	GENERATED_BODY()
-	
 };

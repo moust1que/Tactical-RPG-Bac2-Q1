@@ -10,8 +10,6 @@
  * 
  */
 UCLASS()
-class UNREALPROJECT_API AEnemyUnit : public ABaseCharacter
-{
+class UNREALPROJECT_API AEnemyUnit : public ABaseCharacter {
 	GENERATED_BODY()
-	
 };

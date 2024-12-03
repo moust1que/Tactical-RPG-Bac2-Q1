@@ -6,21 +6,26 @@
 #include "GameFramework/Actor.h"
 #include "Grid.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogGridCpp, Log, All);
+
 UCLASS()
-class UNREALPROJECT_API AGrid : public AActor
-{
+class UNREALPROJECT_API AGrid : public AActor {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	AGrid();
+	public:	
+		// Sets default values for this actor's properties
+		AGrid();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+		// Called every frame
+		virtual void Tick(float DeltaTime) override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AActor> CellActorClass;
+		UPROPERTY(EditAnywhere, Category = "Grid") int32 GridSize = 10;
 
+	protected:
+		// Called when the game starts or when spawned
+		virtual void BeginPlay() override;
+
+	private:
+		void GenerateGrid();
 };
