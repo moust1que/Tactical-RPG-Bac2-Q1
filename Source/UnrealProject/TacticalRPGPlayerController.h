@@ -18,6 +18,8 @@ class UNREALPROJECT_API ATacticalRPGPlayerController : public APlayerController 
 		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<UInputMappingContext> IMC_UnitControl;
 		UPROPERTY(EditAnywhere, Category = "Input") UInputAction* IA_CameraMove;
 
+		UPROPERTY(EditAnywhere, Category = "Camera") float CameraSpeed = 100.0f;
+
 	protected:
 		virtual void BeginPlay() override;
 		virtual void SetupInputComponent() override;

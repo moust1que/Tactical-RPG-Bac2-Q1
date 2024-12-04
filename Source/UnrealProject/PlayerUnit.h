@@ -19,6 +19,6 @@ class UNREALPROJECT_API APlayerUnit : public ABaseCharacter {
 	protected:
 		virtual void BeginPlay() override;
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera") USpringArmComponent* SpringArmComp;
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera") UCameraComponent* CameraComp;
+		UPROPERTY(VisibleAnywhere, Category = "Camera") USpringArmComponent* SpringArmComp;
+		UPROPERTY(VisibleAnywhere, Category = "Camera") UCameraComponent* CameraComp;
 };
