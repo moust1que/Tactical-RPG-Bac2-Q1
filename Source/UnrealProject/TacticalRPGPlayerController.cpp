@@ -5,12 +5,12 @@
 void ATacticalRPGPlayerController::BeginPlay() {
     Super::BeginPlay();
 
-    bShowMouseCursor = true;
+    // bShowMouseCursor = true;
 
     if(ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player)) {
         if(UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) {
-            if(!InputMappingContext.IsNull()) {
-                InputSystem->AddMappingContext(InputMappingContext.LoadSynchronous(), 0);
+            if(!IMC_CameraControl.IsNull()) {
+                InputSystem->AddMappingContext(IMC_CameraControl.LoadSynchronous(), 0);
             }
         }
     }
@@ -26,10 +26,10 @@ void ATacticalRPGPlayerController::SetupInputComponent() {
 
 void ATacticalRPGPlayerController::SetupInputHandling(UInputComponent* PlayerInputComponent) {
     UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-    Input->BindAction(IA_CursorMove, ETriggerEvent::Triggered, this, &ATacticalRPGPlayerController::CursorMove);
+    Input->BindAction(IA_CameraMove, ETriggerEvent::Triggered, this, &ATacticalRPGPlayerController::CameraMove);
 }
 
-void ATacticalRPGPlayerController::CursorMove(const FInputActionInstance& Instance) {
+void ATacticalRPGPlayerController::CameraMove(const FInputActionInstance& Instance) {
     UE_LOG(LogTemp, Warning, TEXT("Cursor Move"));
     FVector2D AxisValue2D = Instance.GetValue().Get<FVector2D>();
     UE_LOG(LogTemp, Warning, TEXT("%f %f"), AxisValue2D.X, AxisValue2D.Y);

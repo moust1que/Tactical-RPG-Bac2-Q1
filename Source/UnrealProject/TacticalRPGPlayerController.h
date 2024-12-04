@@ -14,8 +14,9 @@ class UNREALPROJECT_API ATacticalRPGPlayerController : public APlayerController 
 	GENERATED_BODY()
 
 	public:
-		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<UInputMappingContext> InputMappingContext;
-		UPROPERTY(EditAnywhere, Category = "Input") UInputAction* IA_CursorMove;
+		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<UInputMappingContext> IMC_CameraControl;
+		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<UInputMappingContext> IMC_UnitControl;
+		UPROPERTY(EditAnywhere, Category = "Input") UInputAction* IA_CameraMove;
 
 	protected:
 		virtual void BeginPlay() override;
@@ -23,5 +24,5 @@ class UNREALPROJECT_API ATacticalRPGPlayerController : public APlayerController 
 
 	private:
 		void SetupInputHandling(UInputComponent* PlayerInputComponent);
-		void CursorMove(const FInputActionInstance& Instance);
+		void CameraMove(const FInputActionInstance& Instance);
 };
