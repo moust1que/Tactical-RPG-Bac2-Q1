@@ -38,7 +38,7 @@ void AGrid::GenerateGrid() {
 			int32 posX = newIndexI * cellSize;
 			int32 posY = newIndexJ * cellSize;
 
-			FVector cellPosition = FVector(posX, posY, 0);
+			FVector cellPosition = FVector(posX, posY, 0.2f);
 
 			FActorSpawnParameters spawnParams;
 			world->SpawnActor<AActor>(CellActorClass, cellPosition, FRotator::ZeroRotator, spawnParams);

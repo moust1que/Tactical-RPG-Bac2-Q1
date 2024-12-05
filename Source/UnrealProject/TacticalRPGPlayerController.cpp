@@ -32,9 +32,11 @@ void ATacticalRPGPlayerController::SetupInputHandling(UInputComponent* PlayerInp
 void ATacticalRPGPlayerController::CameraMove(const FInputActionInstance& Instance) {
     FVector2D AxisValue2D = Instance.GetValue().Get<FVector2D>();
     
-    if(AxisValue2D.IsNearlyZero(0.01f)) return;
+    if(AxisValue2D.IsNearlyZero(0.3f)) return;
 
     FVector CameraMovement = FVector(AxisValue2D.Y, AxisValue2D.X, 0.0f) * CameraSpeed * GetWorld()->GetDeltaSeconds();
+
+    UE_LOG(LogTemp, Warning, TEXT("Camera movement: %f / %f"), AxisValue2D.X, AxisValue2D.Y);
 
     if(APawn* ControlledPawn = GetPawn()) {
         FVector NewLocation = ControlledPawn->GetActorLocation() + CameraMovement;
