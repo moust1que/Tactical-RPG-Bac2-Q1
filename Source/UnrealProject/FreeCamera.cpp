@@ -4,13 +4,14 @@
 
 // Sets default values
 AFreeCamera::AFreeCamera() {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	// PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArmComp->SetupAttachment(RootComponent);
     SpringArmComp->TargetArmLength = 1000.0f;
-    SpringArmComp->bDoCollisionTest = false;
+    // SpringArmComp->bDoCollisionTest = false;
     SpringArmComp->bUsePawnControlRotation = false;
 
     CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
