@@ -47,32 +47,21 @@ void ATacticalRPGPlayerController::SetupInputHandling(UInputComponent* PlayerInp
 }
 
 void ATacticalRPGPlayerController::DynamicInputHandler(const FInputActionInstance& Instance) {
-    FName ActionName = Instance.GetSourceAction()->GetFName();
+    FName actionName = Instance.GetSourceAction()->GetFName();
 
-    if (ActionFunctionMapping.Contains(ActionName)) {
-        FName FunctionName = ActionFunctionMapping[ActionName];
+    if (ActionFunctionMapping.Contains(actionName)) {
+        FName functionName = ActionFunctionMapping[actionName];
 
-        if (UFunction* Function = this->FindFunction(FunctionName)) {
-            ProcessFunction(Function, Instance);
+        if (UFunction* function = this->FindFunction(functionName)) {
+            this->ProcessEvent(function, (void*)&Instance);
         } else {
-            UE_LOG(LogTemp, Warning, TEXT("Function %s not found for action %s"), *FunctionName.ToString(), *ActionName.ToString());
+            UE_LOG(LogTemp, Warning, TEXT("Function %s not found for action %s"), *functionName.ToString(), *actionName.ToString());
         }
     }
 }
 
-void ATacticalRPGPlayerController::ProcessFunction(UFunction* function, const FInputActionInstance& Instance) {
-    struct FArguments {
-        const FInputActionInstance& Instance;
-    };
-
-    FArguments args = {Instance};
-
-    this->ProcessEvent(function, &args);
-}
-
 void ATacticalRPGPlayerController::CameraMove(const FInputActionInstance& Instance) {
     FVector2D axisValue2D = Instance.GetValue().Get<FVector2D>();
-    UE_LOG(LogTemp, Log, TEXT("X: %f, Y: %f"), axisValue2D.X, axisValue2D.Y);
     
     if(axisValue2D.IsNearlyZero(0.3f)) return;
 
@@ -88,11 +77,11 @@ void ATacticalRPGPlayerController::CameraMove(const FInputActionInstance& Instan
 }
 
 void ATacticalRPGPlayerController::CameraRotation(const FInputActionInstance& Instance) {
-    float axisValue2DXAxis = Instance.GetValue().Get<FVector2D>().X;
+    float axisValueX = Instance.GetValue().Get<FVector2D>().X;
 
-    if(axisValue2DXAxis <= 0.3f && axisValue2DXAxis >= -0.3f) return;
+    if(FMath::Abs(axisValueX) <= 0.3f) return;
 
-    FRotator cameraRotation = FRotator(0.0f, axisValue2DXAxis, 0.0f) * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
+    FRotator cameraRotation = FRotator(0.0f, axisValueX, 0.0f) * CameraRotationSpeed * GetWorld()->GetDeltaSeconds();
 
     if(APawn* controlledPawn = GetPawn()) {
         FRotator newRotation = controlledPawn->GetActorRotation() + cameraRotation;
@@ -100,18 +89,17 @@ void ATacticalRPGPlayerController::CameraRotation(const FInputActionInstance& In
     }
 }
 
+//! YValue == 0 ?????? WHYYYYYYYYY??????????
 void ATacticalRPGPlayerController::CameraZoom(const FInputActionInstance& Instance) {
     float AxisValueY = Instance.GetValue().Get<FVector2D>().Y;
+    UE_LOG(LogTemp, Log, TEXT("AxisValueY: %f"), AxisValueY);
 
-    // Vérifie si l'entrée est suffisamment significative pour être prise en compte
     if (FMath::Abs(AxisValueY) <= 0.3f) return;
 
     if (SpringArmComp) {
-        // Calcul du nouveau zoom
         float NewLength = SpringArmComp->TargetArmLength - AxisValueY * CameraZoomSpeed * GetWorld()->GetDeltaSeconds();
-        NewLength = FMath::Clamp(NewLength, CameraZoomMin, CameraZoomMax); // Limite le zoom entre des valeurs définies
+        NewLength = FMath::Clamp(NewLength, CameraZoomMin, CameraZoomMax);
 
-        // Met à jour la longueur du SpringArm
         SpringArmComp->TargetArmLength = NewLength;
 
         UE_LOG(LogTemp, Log, TEXT("Updated TargetArmLength: %f"), NewLength);

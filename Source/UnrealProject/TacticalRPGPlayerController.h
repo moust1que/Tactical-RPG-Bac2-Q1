@@ -33,7 +33,6 @@ class UNREALPROJECT_API ATacticalRPGPlayerController : public APlayerController 
 		virtual void SetupInputComponent() override;
 
 	private:
-		void ProcessFunction(UFunction* Function, const FInputActionInstance& Instance);
 		void DynamicInputHandler(const FInputActionInstance& Instance);
 		void SetupInputHandling(UInputComponent* PlayerInputComponent);
 
