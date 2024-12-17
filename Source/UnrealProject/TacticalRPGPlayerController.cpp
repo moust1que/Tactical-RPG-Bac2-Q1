@@ -6,6 +6,8 @@ void ATacticalRPGPlayerController::BeginPlay() {
     Super::BeginPlay();
 
     bShowMouseCursor = true;
+    bEnableMouseOverEvents = true;
+    bEnableClickEvents = true;
 
     if(ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player)) {
         if(UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) {

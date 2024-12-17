@@ -6,8 +6,13 @@ DEFINE_LOG_CATEGORY(LogGridCpp);
 
 // Sets default values
 AGrid::AGrid() {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+void AGrid::OnConstruction(const FTransform& Transform) {
+	Super::OnConstruction(Transform);
+
+	GenerateGrid();
 }
 
 // Called when the game starts or when spawned
@@ -21,27 +26,38 @@ void AGrid::BeginPlay() {
 	}
 }
 
-// Called every frame
-void AGrid::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
-
 void AGrid::GenerateGrid() {
-	UWorld* world = GEngine->GameViewport->GetWorld();
-	const int32 cellSize = 100;
+	UWorld* world;
+	if(GEngine && GEngine->GameViewport) {
+		world = GEngine->GameViewport->GetWorld();
+	}else {
+		UE_LOG(LogGridCpp, Error, TEXT("Game viewport or GEngine not found!"));
+		return;
+	}
+
+	FVector ActorInitialLocation = GetActorLocation();
+	FVector CurCellLocation = ActorInitialLocation;
 
 	for(int32 i = 0; i < GridSize; i++) {
+		CurCellLocation = ActorInitialLocation - FVector(i * 170.0f, 0.0f, 0.0f);
+
 		for(int32 j = 0; j < GridSize; j++) {
-			int32 newIndexI = i - GridSize / 2;
-			int32 newIndexJ = j - GridSize / 2;
+			CurCellLocation.Y = ActorInitialLocation.Y + j * 200.0f;
 
-			int32 posX = newIndexI * cellSize;
-			int32 posY = newIndexJ * cellSize;
-
-			FVector cellPosition = FVector(posX, posY, 0.2f);
+			if(i % 2 == 1) {
+				CurCellLocation.Y += 100.0f;
+			}
 
 			FActorSpawnParameters spawnParams;
-			world->SpawnActor<AActor>(CellActorClass, cellPosition, FRotator::ZeroRotator, spawnParams);
+			world->SpawnActor<AActor>(CellActorClass, CurCellLocation, FRotator::ZeroRotator, spawnParams);
+		}
+	}
+}
+
+void AGrid::OnMouseLeaveGrid() {
+	for(AGridCell* cell : GridCells) {
+		if(cell) {
+			cell->SetInitialColor();
 		}
 	}
 }

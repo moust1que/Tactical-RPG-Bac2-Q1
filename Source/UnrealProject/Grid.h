@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GridCell.h"
 #include "Grid.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogGridCpp, Log, All);
@@ -16,16 +17,18 @@ class UNREALPROJECT_API AGrid : public AActor {
 		// Sets default values for this actor's properties
 		AGrid();
 
-		// Called every frame
-		virtual void Tick(float DeltaTime) override;
-
 		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AActor> CellActorClass;
-		UPROPERTY(EditAnywhere, Category = "Grid") int32 GridSize = 10;
+		UPROPERTY(EditAnywhere, Category = "Grid") int32 GridSize = 15;
 
 	protected:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;
+		virtual void OnConstruction(const FTransform& Transform) override;
 
 	private:
-		void GenerateGrid();
+		UFUNCTION() void GenerateGrid();
+
+		UFUNCTION() void OnMouseLeaveGrid();
+
+		UPROPERTY() TArray<AGridCell*> GridCells;
 };
