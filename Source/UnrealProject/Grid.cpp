@@ -9,12 +9,6 @@ AGrid::AGrid() {
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void AGrid::OnConstruction(const FTransform& Transform) {
-	Super::OnConstruction(Transform);
-
-	GenerateGrid();
-}
-
 // Called when the game starts or when spawned
 void AGrid::BeginPlay() {
 	Super::BeginPlay();

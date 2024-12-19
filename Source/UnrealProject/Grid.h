@@ -23,7 +23,6 @@ class UNREALPROJECT_API AGrid : public AActor {
 	protected:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;
-		virtual void OnConstruction(const FTransform& Transform) override;
 
 	private:
 		UFUNCTION() void GenerateGrid();
