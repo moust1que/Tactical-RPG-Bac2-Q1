@@ -2,11 +2,12 @@
 
 #include "Grid.h"
 
-DEFINE_LOG_CATEGORY(LogGridCpp);
-
 // Sets default values
 AGrid::AGrid() {
 	PrimaryActorTick.bCanEverTick = false;
+
+	GridRoot = CreateDefaultSubobject<USceneComponent>(TEXT("GridRoot"));
+	RootComponent = GridRoot;
 }
 
 // Called when the game starts or when spawned
@@ -14,23 +15,23 @@ void AGrid::BeginPlay() {
 	Super::BeginPlay();
 
 	if(!CellActorClass) {
-		UE_LOG(LogGridCpp, Error, TEXT("Cell actor class not found! Please assign it in the editor."));
+		UE_LOG(LogTemp, Error, TEXT("Cell actor class not found! Please assign it in the editor."));
 	}else {
 		GenerateGrid();
 	}
 }
 
 void AGrid::GenerateGrid() {
-	UWorld* world;
-	if(GEngine && GEngine->GameViewport) {
-		world = GEngine->GameViewport->GetWorld();
-	}else {
-		UE_LOG(LogGridCpp, Error, TEXT("Game viewport or GEngine not found!"));
+	UWorld* world = GetWorld();
+	if(!world) {
+		UE_LOG(LogTemp, Error, TEXT("World not found!"));
 		return;
 	}
 
 	FVector ActorInitialLocation = GetActorLocation();
 	FVector CurCellLocation = ActorInitialLocation;
+
+	GridCells.SetNum(GridSize * GridSize);
 
 	for(int32 i = 0; i < GridSize; i++) {
 		CurCellLocation = ActorInitialLocation - FVector(i * 170.0f, 0.0f, 0.0f);
@@ -43,7 +44,11 @@ void AGrid::GenerateGrid() {
 			}
 
 			FActorSpawnParameters spawnParams;
-			world->SpawnActor<AActor>(CellActorClass, CurCellLocation, FRotator::ZeroRotator, spawnParams);
+			AGridCell* SpawnedCell = world->SpawnActor<AGridCell>(CellActorClass, CurCellLocation, FRotator::ZeroRotator, spawnParams);
+			if(SpawnedCell) {
+				GridCells[i + j * GridSize] = SpawnedCell;
+				SpawnedCell->AttachToComponent(GridRoot, FAttachmentTransformRules::KeepWorldTransform);
+			}
 		}
 	}
 }

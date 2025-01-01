@@ -7,8 +7,6 @@
 #include "GridCell.h"
 #include "Grid.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogGridCpp, Log, All);
-
 UCLASS()
 class UNREALPROJECT_API AGrid : public AActor {
 	GENERATED_BODY()
@@ -30,4 +28,5 @@ class UNREALPROJECT_API AGrid : public AActor {
 		UFUNCTION() void OnMouseLeaveGrid();
 
 		UPROPERTY() TArray<AGridCell*> GridCells;
+		UPROPERTY() USceneComponent* GridRoot;
 };

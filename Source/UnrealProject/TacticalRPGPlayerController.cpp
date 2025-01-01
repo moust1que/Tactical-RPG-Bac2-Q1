@@ -8,6 +8,8 @@ void ATacticalRPGPlayerController::BeginPlay() {
     bShowMouseCursor = true;
     bEnableMouseOverEvents = true;
     bEnableClickEvents = true;
+    
+    SetInputMode(FInputModeGameAndUI());
 
     if(ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player)) {
         if(UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) {

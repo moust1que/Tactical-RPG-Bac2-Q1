@@ -23,8 +23,6 @@ void AFreeCamera::BeginPlay() {
 	Super::BeginPlay();
 
 	SpringArmComp->SetRelativeRotation(FRotator(-50.0f, 0.0f, 0.0f));
-	SetActorRotation(FRotator(0.0f, -90.0f, 0.0f));
-	SetActorLocation(FVector(0.0f, -900.0f, 290.0f));
 }
 
 // Called every frame
