@@ -77,3 +77,11 @@ void AGridCell::SetInitialColor() {
 		DynamicMaterial->SetVectorParameterValue(TEXT("CellColor"), InitialColor);
 	}
 }
+
+void AGridCell::SetAsObstacle() {
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DynamicMaterial->SetVectorParameterValue(TEXT("CellColor"), FLinearColor(0.2f, 0.2f, 0.2f, 1.0f));
+
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+}
