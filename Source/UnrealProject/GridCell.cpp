@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GridCell.h"
+#include "TacticalRPGGameMode.h"
 
 // Sets default values
 AGridCell::AGridCell() {
@@ -66,6 +67,10 @@ void AGridCell::OnMouseClickOnCell(UPrimitiveComponent* ClickedComponent, FKey B
 	if (DynamicMaterial) {
         DynamicMaterial->SetVectorParameterValue(TEXT("CellColor"), FLinearColor(0.0f, 1.0f, 0.0f, 1.0f));
     }
+
+	APlayerController* playerController = GetWorld()->GetFirstPlayerController<APlayerController>();
+	ATacticalRPGGameMode* gameMode = Cast<ATacticalRPGGameMode>(GetWorld()->GetAuthGameMode());
+	gameMode->HandleCellClick(this);
 }
 
 void AGridCell::OnMouseLeaveCell(UPrimitiveComponent* OverComponent) {
@@ -78,10 +83,20 @@ void AGridCell::SetInitialColor() {
 	}
 }
 
+void AGridCell::SetColor(FLinearColor Color) {
+	if (DynamicMaterial) {
+		DynamicMaterial->SetVectorParameterValue(TEXT("CellColor"), Color);
+	}
+}
+
 void AGridCell::SetAsObstacle() {
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	DynamicMaterial->SetVectorParameterValue(TEXT("CellColor"), FLinearColor(0.2f, 0.2f, 0.2f, 1.0f));
 
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+}
+
+void AGridCell::PlaceUnit(TSubclassOf<APlayerUnit> UnitClass) {
+	UE_LOG(LogTemp, Warning, TEXT("PlaceUnit not implemented yet."));
 }

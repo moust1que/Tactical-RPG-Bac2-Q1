@@ -17,12 +17,6 @@ class UNREALPROJECT_API AFreeCamera : public APawn {
 		// Sets default values for this pawn's properties
 		AFreeCamera();
 
-		// Called every frame
-		virtual void Tick(float DeltaTime) override;
-
-		// Called to bind functionality to input
-		virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 		void HandleFunctionCall(FName FunctionName, const FInputActionInstance& Instance, FName actionName);
 
 		UPROPERTY(EditAnywhere, Category = "Camera") float CameraSpeed = 100.0f;

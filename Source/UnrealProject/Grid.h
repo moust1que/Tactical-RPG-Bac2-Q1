@@ -18,6 +18,8 @@ class UNREALPROJECT_API AGrid : public AActor {
 		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AActor> CellActorClass;
 		UPROPERTY(EditAnywhere, Category = "Grid") int32 GridSize = 15;
 
+		UPROPERTY() TArray<AGridCell*> GridCells;
+
 	protected:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;
@@ -26,8 +28,6 @@ class UNREALPROJECT_API AGrid : public AActor {
 		UFUNCTION() void GenerateGrid();
 		UFUNCTION() void OnMouseLeaveGrid();
 		UFUNCTION() void DetectObstacles(UWorld* world);
-
-		UPROPERTY() TArray<AGridCell*> GridCells;
 		UPROPERTY() USceneComponent* GridRoot;
 		UPROPERTY() int32 CellSizeX = 170, CellSizeY = 200;
 };

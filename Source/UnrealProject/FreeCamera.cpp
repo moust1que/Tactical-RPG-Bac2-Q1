@@ -25,16 +25,6 @@ void AFreeCamera::BeginPlay() {
 	SpringArmComp->SetRelativeRotation(FRotator(-50.0f, 0.0f, 0.0f));
 }
 
-// Called every frame
-void AFreeCamera::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
-void AFreeCamera::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
 void AFreeCamera::CalculateHexagonNormals() {
 	HexNormals.Empty();
 

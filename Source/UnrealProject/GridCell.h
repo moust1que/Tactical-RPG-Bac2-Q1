@@ -22,7 +22,9 @@ class UNREALPROJECT_API AGridCell : public AActor {
 		UPROPERTY(EditAnywhere, Category = "GridCell") UMaterialInterface* BaseMaterial;
 		
 		UFUNCTION() void SetInitialColor();
+		UFUNCTION() void SetColor(FLinearColor Color);
 		UFUNCTION() void SetAsObstacle();
+		UFUNCTION() void PlaceUnit(TSubclassOf<APlayerUnit> UnitType);
 
 	protected:
 		// Called when the game starts or when spawned
