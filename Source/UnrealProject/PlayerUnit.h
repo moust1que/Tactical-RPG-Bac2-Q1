@@ -13,4 +13,7 @@
 UCLASS()
 class UNREALPROJECT_API APlayerUnit : public ABaseCharacter {
 	GENERATED_BODY()
+
+	protected:
+		virtual void BeginPlay() override;
 };

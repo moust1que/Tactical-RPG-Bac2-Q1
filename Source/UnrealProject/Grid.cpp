@@ -72,10 +72,10 @@ void AGrid::DetectObstacles(UWorld* world) {
 	}
 }
 
-void AGrid::OnMouseLeaveGrid() {
-	for(AGridCell* cell : GridCells) {
-		if(cell) {
-			cell->SetInitialColor();
-		}
-	}
-}
+// void AGrid::OnMouseLeaveGrid() {
+// 	for(AGridCell* cell : GridCells) {
+// 		if(cell) {
+// 			cell->SetInitialColor();
+// 		}
+// 	}
+// }

@@ -11,6 +11,8 @@ ABaseCharacter::ABaseCharacter() {
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay() {
 	Super::BeginPlay();
+
+	TurnProgress = TurnSpeed;
 }
 
 // Called every frame
@@ -22,3 +24,5 @@ void ABaseCharacter::Tick(float DeltaTime) {
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
+
+void ABaseCharacter::TakeTurn() {}

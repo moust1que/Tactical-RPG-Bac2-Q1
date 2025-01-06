@@ -20,14 +20,20 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 		// Called to bind functionality to input
 		virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+		UFUNCTION()
+		virtual void TakeTurn();
+		
+		bool bIsHero;
+
+		int32 TurnSpeed;
+		int32 TurnProgress;
+		int32 DisplacementRange;
+		int32 AttackRange;
+		int32 Health;
+		int32 Damage;
+		int32 Critical;
+
 	protected:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;
-
-		FName Name;
-		int32 Health;
-		int32 MaxHealth;
-		int32 AttackPower;
-
-		int32 x, y;
 };

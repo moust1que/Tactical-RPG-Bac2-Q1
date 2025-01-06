@@ -6,9 +6,11 @@
 #include "GameFramework/GameMode.h"
 #include "TacticalRPGPlayerController.h"
 #include "PlayerUnit.h"
+#include "EnemyUnit.h"
 #include "Grid.h"
 #include "GridCell.h"
 #include "Blueprint/UserWidget.h"
+#include "BaseCharacter.h"
 #include "TacticalRPGGameMode.generated.h"
 
 UENUM()
@@ -24,7 +26,7 @@ enum class EUnitType : uint8 {
     Knight,
     Rogue,
     Mage,
-    Warrior
+    Barbarian
 };
 
 UCLASS()
@@ -42,7 +44,7 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		void SetGameState(EGameState NewGameState);
 
 		UFUNCTION(BlueprintCallable)
-		void PlaceUnit(EUnitType UnitType);
+		void SelectUnitToSpawn(EUnitType UnitType);
 		UFUNCTION()
 		void HandleCellClick(AGridCell* ClickedCell);
 
@@ -50,10 +52,21 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> PlacingMenuWidgetClass;
 
-		UPROPERTY(EditAnywhere, Category = "Units") TSubclassOf<APlayerUnit> Knight;
-		UPROPERTY(EditAnywhere, Category = "Units") TSubclassOf<APlayerUnit> Rogue;
-		UPROPERTY(EditAnywhere, Category = "Units") TSubclassOf<APlayerUnit> Mage;
-		UPROPERTY(EditAnywhere, Category = "Units") TSubclassOf<APlayerUnit> Warrior;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Knight;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Rogue;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Mage;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Barbarian;
+
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> RogueSkeleton;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> MageSkeleton;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> MinionSkeleton;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> WarriorSkeleton;
+
+		UPROPERTY() TArray<ABaseCharacter*> AllUnits;
+
+		UPROPERTY() bool bPlacingUnits = false;
+
+		UFUNCTION() void RegisterUnit(ABaseCharacter* Unit);
 
 	private:
 		void HandleGameStateChange(EGameState NewGameState);
@@ -68,7 +81,16 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 
 		UPROPERTY() UUserWidget* PlacingMenuWidget;
 		UPROPERTY() TSubclassOf<APlayerUnit> CurrentUnitType;
-		UPROPERTY() bool bPlacingUnits = false;
 		void ShowPlacingMenu();
 		void HidePlacingMenu();
+
+		void SortUnitsBySpeed();
+		void StartTurnSystem();
+		void StartTurnForUnit(ABaseCharacter* Unit);
+
+		void PlaceUnit(TSubclassOf<ABaseCharacter> UnitTypeToSpawn, bool bIsHero, AGridCell* CellToSpawnOn);
+
+		UPROPERTY() bool bCombatActive = true;
+
+		void EndGame();
 };

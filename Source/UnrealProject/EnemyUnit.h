@@ -12,4 +12,7 @@
 UCLASS()
 class UNREALPROJECT_API AEnemyUnit : public ABaseCharacter {
 	GENERATED_BODY()
+
+	protected:
+		virtual void BeginPlay() override;
 };

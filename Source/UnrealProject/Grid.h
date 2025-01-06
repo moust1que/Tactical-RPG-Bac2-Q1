@@ -26,7 +26,7 @@ class UNREALPROJECT_API AGrid : public AActor {
 
 	private:
 		UFUNCTION() void GenerateGrid();
-		UFUNCTION() void OnMouseLeaveGrid();
+		// UFUNCTION() void OnMouseLeaveGrid();
 		UFUNCTION() void DetectObstacles(UWorld* world);
 		UPROPERTY() USceneComponent* GridRoot;
 		UPROPERTY() int32 CellSizeX = 170, CellSizeY = 200;

@@ -23,11 +23,14 @@ void ATacticalRPGGameMode::BeginPlay() {
         GridCells = Grid->GridCells;
     }
 
+    PlaceUnit(RogueSkeleton, false, GridCells[133]);
+    PlaceUnit(MageSkeleton, false, GridCells[14]);
+    PlaceUnit(MinionSkeleton, false, GridCells[208]);
+    PlaceUnit(WarriorSkeleton, false, GridCells[103]);
+
     PlayerController = GetWorld()->GetFirstPlayerController();
 
     PlacingMenuWidget = CreateWidget<UUserWidget>(PlayerController, PlacingMenuWidgetClass);
-
-    ShowPlacingMenu();
 
     SetGameState(EGameState::PlacingUnits);
 }
@@ -42,6 +45,7 @@ void ATacticalRPGGameMode::SetGameState(EGameState NewGameState) {
 void ATacticalRPGGameMode::HandleGameStateChange(EGameState NewGameState) {
     switch (NewGameState) {
         case EGameState::PlacingUnits:
+            ShowPlacingMenu();
             break;
         case EGameState::PlayerPhase:
             break;
@@ -52,7 +56,7 @@ void ATacticalRPGGameMode::HandleGameStateChange(EGameState NewGameState) {
     }
 }
 
-void ATacticalRPGGameMode::PlaceUnit(EUnitType UnitType) {
+void ATacticalRPGGameMode::SelectUnitToSpawn(EUnitType UnitType) {
     HidePlacingMenu();
 
     switch(UnitType) {
@@ -65,8 +69,8 @@ void ATacticalRPGGameMode::PlaceUnit(EUnitType UnitType) {
         case EUnitType::Mage:
             CurrentUnitType = Mage;
             break;
-        case EUnitType::Warrior:
-            CurrentUnitType = Warrior;
+        case EUnitType::Barbarian:
+            CurrentUnitType = Barbarian;
             break;
         default:
             break;
@@ -76,14 +80,12 @@ void ATacticalRPGGameMode::PlaceUnit(EUnitType UnitType) {
 
     for(int32 i = 0; i < 15; i++) {
         for(int32 j = 0; j < 2; j++) {
-            GridCells[i * 15 + j]->SetColor(FLinearColor(0.2f, 0.2f, 1.0f, 1.0f));
+            if(GridCells[i * 15 + j]->IsEmpty()) {
+                GridCells[i * 15 + j]->SetState(ECellState::Highlighted);
+                GridCells[i * 15 + j]->HoverColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
+            }
         }
     }
-
-    // UnitsPlaced++;
-    // if(UnitsPlaced < MaxUnits) {
-    //     ShowPlacingMenu();
-    // }
 }
 
 void ATacticalRPGGameMode::ShowPlacingMenu() {
@@ -102,14 +104,18 @@ void ATacticalRPGGameMode::HidePlacingMenu() {
 }
 
 void ATacticalRPGGameMode::HandleCellClick(AGridCell* ClickedCell) {
-    if(bPlacingUnits && ClickedCell /*&& !ClickedCell->IsOccupied()*/) {
-        ClickedCell->PlaceUnit(CurrentUnitType);
+    if(bPlacingUnits && ClickedCell) {
+        // ClickedCell->PlaceUnit(CurrentUnitType, true);
+        PlaceUnit(CurrentUnitType, true, ClickedCell);
 
         bPlacingUnits = false;
 
         for(int32 i = 0; i < 15; i++) {
             for(int32 j = 0; j < 2; j++) {
-                GridCells[i * 15 + j]->SetColor(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
+                if(GridCells[i * 15 + j]->IsHighlighted()) {
+                    GridCells[i * 15 + j]->SetState(ECellState::Empty);
+                    GridCells[i * 15 + j]->HoverColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f);
+                }
             }
         }
 
@@ -120,4 +126,40 @@ void ATacticalRPGGameMode::HandleCellClick(AGridCell* ClickedCell) {
             SetGameState(EGameState::PlayerPhase);
         }
     }
+}
+
+void ATacticalRPGGameMode::PlaceUnit(TSubclassOf<ABaseCharacter> UnitTypeToSpawn, bool bIsHero, AGridCell* CellToSpawnOn) {
+    CellToSpawnOn->SetState(bIsHero ? ECellState::OccupiedHero : ECellState::OccupiedEnemy);
+
+    FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	ABaseCharacter* SpawnedUnit = GetWorld()->SpawnActor<ABaseCharacter>(UnitTypeToSpawn, CellToSpawnOn->GetActorLocation(), bIsHero ? FRotator::ZeroRotator : FRotator(0.0f, 180.0f, 0.0f), SpawnParams);
+
+    RegisterUnit(SpawnedUnit);
+}
+
+void ATacticalRPGGameMode::RegisterUnit(ABaseCharacter* Unit) {
+    AllUnits.Add(Unit);
+}
+
+void ATacticalRPGGameMode::SortUnitsBySpeed() {
+    AllUnits.Sort([](const ABaseCharacter& A, const ABaseCharacter& B) {
+        return A.TurnSpeed > B.TurnSpeed;
+    });
+}
+
+void ATacticalRPGGameMode::StartTurnSystem() {
+    SortUnitsBySpeed();
+
+    StartTurnForUnit(AllUnits[0]);
+}
+
+void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
+    Unit->TakeTurn();
+
+    for(ABaseCharacter* unit : AllUnits) {
+        unit->TurnProgress -= Unit->TurnSpeed;
+    }
+    Unit->TurnProgress = Unit->TurnSpeed;
 }
