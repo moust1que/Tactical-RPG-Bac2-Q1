@@ -33,6 +33,8 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 		int32 Damage;
 		int32 Critical;
 
+		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI") UTexture2D* PortraitTexture;
+
 	protected:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;

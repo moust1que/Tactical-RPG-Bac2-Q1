@@ -31,6 +31,7 @@ void ATacticalRPGGameMode::BeginPlay() {
     PlayerController = GetWorld()->GetFirstPlayerController();
 
     PlacingMenuWidget = CreateWidget<UUserWidget>(PlayerController, PlacingMenuWidgetClass);
+    BattleUIWidget = CreateWidget<UUserWidget>(PlayerController, BattleUIWidgetClass);
 
     SetGameState(EGameState::PlacingUnits);
 }
@@ -47,9 +48,10 @@ void ATacticalRPGGameMode::HandleGameStateChange(EGameState NewGameState) {
         case EGameState::PlacingUnits:
             ShowPlacingMenu();
             break;
-        case EGameState::PlayerPhase:
+        case EGameState::PlayPhase:
+            StartTurnSystem();
             break;
-        case EGameState::EnemyPhase:
+        case EGameState::EndPhase:
             break;
         default:
             break;
@@ -103,9 +105,16 @@ void ATacticalRPGGameMode::HidePlacingMenu() {
     PlayerController->SetInputMode(inputModeData);
 }
 
+void ATacticalRPGGameMode::ShowBattleUI() {
+    BattleUIWidget->AddToViewport();
+}
+
+void ATacticalRPGGameMode::HideBattleUI() {
+    BattleUIWidget->RemoveFromParent();
+}
+
 void ATacticalRPGGameMode::HandleCellClick(AGridCell* ClickedCell) {
     if(bPlacingUnits && ClickedCell) {
-        // ClickedCell->PlaceUnit(CurrentUnitType, true);
         PlaceUnit(CurrentUnitType, true, ClickedCell);
 
         bPlacingUnits = false;
@@ -123,7 +132,7 @@ void ATacticalRPGGameMode::HandleCellClick(AGridCell* ClickedCell) {
         if(UnitsPlaced < MaxUnits) {
             ShowPlacingMenu();
         }else {
-            SetGameState(EGameState::PlayerPhase);
+            SetGameState(EGameState::PlayPhase);
         }
     }
 }
@@ -145,12 +154,14 @@ void ATacticalRPGGameMode::RegisterUnit(ABaseCharacter* Unit) {
 
 void ATacticalRPGGameMode::SortUnitsBySpeed() {
     AllUnits.Sort([](const ABaseCharacter& A, const ABaseCharacter& B) {
-        return A.TurnSpeed > B.TurnSpeed;
+        return A.TurnSpeed < B.TurnSpeed;
     });
 }
 
 void ATacticalRPGGameMode::StartTurnSystem() {
     SortUnitsBySpeed();
+
+    ShowBattleUI();
 
     StartTurnForUnit(AllUnits[0]);
 }

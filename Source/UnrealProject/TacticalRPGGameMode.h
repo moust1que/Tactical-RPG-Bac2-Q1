@@ -17,8 +17,8 @@ UENUM()
 enum class EGameState : uint8 {
 	Starting,
 	PlacingUnits,
-	PlayerPhase,
-	EnemyPhase
+	PlayPhase,
+	EndPhase
 };
 
 UENUM()
@@ -51,6 +51,7 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AGrid> GridRef;
 
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> PlacingMenuWidgetClass;
+		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> BattleUIWidgetClass;
 
 		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Knight;
 		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Rogue;
@@ -62,7 +63,7 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> MinionSkeleton;
 		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> WarriorSkeleton;
 
-		UPROPERTY() TArray<ABaseCharacter*> AllUnits;
+		UPROPERTY(BlueprintReadWrite) TArray<ABaseCharacter*> AllUnits;
 
 		UPROPERTY() bool bPlacingUnits = false;
 
@@ -80,9 +81,14 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY() TArray<AGridCell*> GridCells;
 
 		UPROPERTY() UUserWidget* PlacingMenuWidget;
+		UPROPERTY() UUserWidget* BattleUIWidget;
 		UPROPERTY() TSubclassOf<APlayerUnit> CurrentUnitType;
+
 		void ShowPlacingMenu();
 		void HidePlacingMenu();
+
+		void ShowBattleUI();
+		void HideBattleUI();
 
 		void SortUnitsBySpeed();
 		void StartTurnSystem();
