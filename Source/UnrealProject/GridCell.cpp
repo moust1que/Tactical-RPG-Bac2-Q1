@@ -34,6 +34,7 @@ void AGridCell::BeginPlay() {
         UE_LOG(LogTemp, Error, TEXT("CellMesh is null! Assign a valid mesh in the editor or Blueprint."));
         return;
     }
+
     MeshComponent->SetStaticMesh(CellMesh);
 	MeshComponent->SetRelativeRotation(FRotator(0.0f, 30.0f, 0.0f));
 
@@ -84,7 +85,7 @@ void AGridCell::UpdateColorByState() {
             SetColor(FLinearColor(1.0f, 0.0f, 0.0f, 1.0f)); // Rouge
             break;
         case ECellState::Highlighted:
-            SetColor(FLinearColor(0.118f, 0.753f, 0.91f, 1.0f)); // Bleu clair
+            SetColor(FLinearColor(0.0f, 0.871f, 1.f, 1.0f)); // Bleu clair
             break;
     }
 }
@@ -118,4 +119,41 @@ void AGridCell::SetColor(FLinearColor Color) {
 void AGridCell::SetAsObstacle() {
     SetState(ECellState::Obstacle);
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+TArray<AGridCell*> AGridCell::GetNeighborsOddR() {
+    TArray<AGridCell*> neighbors;
+
+    Grid = GetWorld()->GetAuthGameMode<ATacticalRPGGameMode>()->Grid;
+    if(!Grid) {
+        UE_LOG(LogTemp, Error, TEXT("Grid is null!"));
+        return neighbors;
+    }
+
+    int32 parity = Y & 1;
+    TArray<FVector2D> oddDirections[2] = {
+        {
+            FVector2D(1,  0), FVector2D( 0, 1), FVector2D(-1, 1),
+            FVector2D(-1,  0), FVector2D(-1, -1), FVector2D( 0, -1)
+        },
+        {
+            FVector2D(1,  0), FVector2D(1, 1), FVector2D( 0, 1),
+            FVector2D(-1,  0), FVector2D( 0, -1), FVector2D(1, -1)
+        }
+    };
+
+    for(const FVector2D& direction : oddDirections[parity]) {
+        if(X + direction.X < 0 || X + direction.X >= Grid->GridSize || Y + direction.Y < 0 || Y + direction.Y >= Grid->GridSize) {
+            continue;
+        }
+
+        AGridCell* neighborCell = Grid->GridCells[(X + direction.X) * Grid->GridSize + Y + direction.Y];
+        if(!neighborCell || !neighborCell->IsEmpty()) {
+            continue;
+        }
+
+        neighbors.Add(neighborCell);
+    }
+
+    return neighbors;
 }

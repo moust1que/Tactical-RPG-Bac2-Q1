@@ -69,6 +69,8 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 
 		UFUNCTION() void RegisterUnit(ABaseCharacter* Unit);
 
+		UPROPERTY() AGrid* Grid;
+
 	private:
 		void HandleGameStateChange(EGameState NewGameState);
 
@@ -77,7 +79,6 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY() int32 UnitsPlaced = 0;
 		UPROPERTY() int32 MaxUnits = 4;
 
-		UPROPERTY() AGrid* Grid;
 		UPROPERTY() TArray<AGridCell*> GridCells;
 
 		UPROPERTY() UUserWidget* PlacingMenuWidget;

@@ -9,7 +9,10 @@
 UCLASS()
 class UNREALPROJECT_API ARogueSkeleton : public AEnemyUnit {
 	GENERATED_BODY()
+
+	// ARogueSkeleton();
 	
 	protected:
 		virtual void BeginPlay() override;
+		// void PostInitializeComponents() override;
 };

@@ -145,6 +145,8 @@ void ATacticalRPGGameMode::PlaceUnit(TSubclassOf<ABaseCharacter> UnitTypeToSpawn
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	ABaseCharacter* SpawnedUnit = GetWorld()->SpawnActor<ABaseCharacter>(UnitTypeToSpawn, CellToSpawnOn->GetActorLocation(), bIsHero ? FRotator::ZeroRotator : FRotator(0.0f, 180.0f, 0.0f), SpawnParams);
 
+    SpawnedUnit->CurCell = CellToSpawnOn;
+
     RegisterUnit(SpawnedUnit);
 }
 
@@ -154,11 +156,15 @@ void ATacticalRPGGameMode::RegisterUnit(ABaseCharacter* Unit) {
 
 void ATacticalRPGGameMode::SortUnitsBySpeed() {
     AllUnits.Sort([](const ABaseCharacter& A, const ABaseCharacter& B) {
-        return A.TurnSpeed < B.TurnSpeed;
+        return A.TurnProgress < B.TurnProgress;
     });
 }
 
 void ATacticalRPGGameMode::StartTurnSystem() {
+    for(ABaseCharacter* unit : AllUnits) {
+        unit->TurnProgress = unit->TurnSpeed;
+    }
+
     SortUnitsBySpeed();
 
     ShowBattleUI();
@@ -167,7 +173,7 @@ void ATacticalRPGGameMode::StartTurnSystem() {
 }
 
 void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
-    Unit->TakeTurn();
+    Unit->TakeTurn(Grid);
 
     for(ABaseCharacter* unit : AllUnits) {
         unit->TurnProgress -= Unit->TurnSpeed;

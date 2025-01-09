@@ -8,12 +8,20 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GridCell.h"
+#include "Grid.h"
 #include "PlayerUnit.generated.h"
 
 UCLASS()
 class UNREALPROJECT_API APlayerUnit : public ABaseCharacter {
 	GENERATED_BODY()
 
-	protected:
-		virtual void BeginPlay() override;
+	public:
+		APlayerUnit();
+
+		UFUNCTION()
+		void HandleCellClick(AGridCell* ClickedCell);
+
+		void TakeTurn(AGrid* Grid) override;
+		void HighlightCellsInRange(AGrid* Grid);
 };

@@ -6,13 +6,13 @@
 #include "BaseCharacter.h"
 #include "EnemyUnit.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UNREALPROJECT_API AEnemyUnit : public ABaseCharacter {
 	GENERATED_BODY()
 
-	protected:
-		virtual void BeginPlay() override;
+	// protected:
+	// 	virtual void BeginPlay() override;
+
+	public:
+		AEnemyUnit();
 };

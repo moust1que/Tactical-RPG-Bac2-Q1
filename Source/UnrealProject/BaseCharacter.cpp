@@ -8,21 +8,19 @@ ABaseCharacter::ABaseCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void ABaseCharacter::BeginPlay() {
-	Super::BeginPlay();
+// // Called when the game starts or when spawned
+// void ABaseCharacter::BeginPlay() {
+// 	Super::BeginPlay();
+// }
 
-	TurnProgress = TurnSpeed;
-}
-
-// Called every frame
-void ABaseCharacter::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
+// // Called every frame
+// void ABaseCharacter::Tick(float DeltaTime) {
+// 	Super::Tick(DeltaTime);
+// }
 
 // Called to bind functionality to input
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseCharacter::TakeTurn() {}
+void ABaseCharacter::TakeTurn(AGrid* Grid) {}

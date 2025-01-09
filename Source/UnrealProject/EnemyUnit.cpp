@@ -2,8 +2,6 @@
 
 #include "EnemyUnit.h"
 
-void AEnemyUnit::BeginPlay() {
-    Super::BeginPlay();
-
+AEnemyUnit::AEnemyUnit() {
     bIsHero = false;
 }
