@@ -24,7 +24,9 @@ void ATacticalRPGGameMode::BeginPlay() {
     }
 
     PlaceUnit(RogueSkeleton, false, GridCells[133]);
-    PlaceUnit(MageSkeleton, false, GridCells[14]);
+    // PlaceUnit(RogueSkeleton, false, GridCells[63]);
+    // PlaceUnit(MageSkeleton, false, GridCells[14]);
+    PlaceUnit(MageSkeleton, false, GridCells[63]);
     PlaceUnit(MinionSkeleton, false, GridCells[208]);
     PlaceUnit(WarriorSkeleton, false, GridCells[103]);
 
@@ -146,6 +148,7 @@ void ATacticalRPGGameMode::PlaceUnit(TSubclassOf<ABaseCharacter> UnitTypeToSpawn
 	ABaseCharacter* SpawnedUnit = GetWorld()->SpawnActor<ABaseCharacter>(UnitTypeToSpawn, CellToSpawnOn->GetActorLocation(), bIsHero ? FRotator::ZeroRotator : FRotator(0.0f, 180.0f, 0.0f), SpawnParams);
 
     SpawnedUnit->CurCell = CellToSpawnOn;
+    CellToSpawnOn->SetOccupant(SpawnedUnit);
 
     RegisterUnit(SpawnedUnit);
 }
@@ -176,7 +179,17 @@ void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
     Unit->TakeTurn(Grid);
 
     for(ABaseCharacter* unit : AllUnits) {
-        unit->TurnProgress -= Unit->TurnSpeed;
+        if(unit == Unit) {
+            continue;
+        }
+        
+        unit->TurnProgress -= Unit->TurnProgress;
+        UE_LOG(LogTemp, Warning, TEXT("%s's turn progress: %d"), *unit->GetName(), unit->TurnProgress);
     }
     Unit->TurnProgress = Unit->TurnSpeed;
+}
+
+void ATacticalRPGGameMode::RemoveUnit(ABaseCharacter* Unit) {
+    AllUnits.Remove(Unit);
+    SortUnitsBySpeed();
 }

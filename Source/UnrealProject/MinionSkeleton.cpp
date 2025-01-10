@@ -7,8 +7,8 @@ void AMinionSkeleton::BeginPlay() {
 
     DisplacementRange = 4;
     AttackRange = 1;
-    Health = 50;
+    MaxHealth = 50;
+    Health = MaxHealth;
     Damage = 15;
-    Critical = 5;
     TurnSpeed = 20;
 }

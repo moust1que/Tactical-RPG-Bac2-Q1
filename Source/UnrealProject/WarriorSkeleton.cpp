@@ -7,8 +7,8 @@ void AWarriorSkeleton::BeginPlay() {
 
     DisplacementRange = 4;
     AttackRange = 1;
-    Health = 100;
+    MaxHealth = 100;
+    Health = MaxHealth;
     Damage = 30;
-    Critical = 5;
     TurnSpeed = 25;
 }

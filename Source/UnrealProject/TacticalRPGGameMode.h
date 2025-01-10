@@ -68,8 +68,12 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY() bool bPlacingUnits = false;
 
 		UFUNCTION() void RegisterUnit(ABaseCharacter* Unit);
+		UFUNCTION() void RemoveUnit(ABaseCharacter* Unit);
 
 		UPROPERTY() AGrid* Grid;
+
+		UFUNCTION(BlueprintCallable) void SortUnitsBySpeed();
+		UFUNCTION(BlueprintCallable) void StartTurnForUnit(ABaseCharacter* Unit);
 
 	private:
 		void HandleGameStateChange(EGameState NewGameState);
@@ -90,10 +94,7 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 
 		void ShowBattleUI();
 		void HideBattleUI();
-
-		void SortUnitsBySpeed();
 		void StartTurnSystem();
-		void StartTurnForUnit(ABaseCharacter* Unit);
 
 		void PlaceUnit(TSubclassOf<ABaseCharacter> UnitTypeToSpawn, bool bIsHero, AGridCell* CellToSpawnOn);
 

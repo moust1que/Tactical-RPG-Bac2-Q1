@@ -26,7 +26,11 @@ class UNREALPROJECT_API AGrid : public AActor {
 		FVector OddRToCubic(int32 X, int32 Y);
 		bool IsPathAvailable(AGridCell* startCell, AGridCell* targetCell, int32 Range);
 		int32 ManhattanDistanceOddR(int32 x1, int32 y1, int32 x2, int32 y2);
-		double euclideanDistance(int32 x1, int32 y1, int32 x2, int32 y2);
+
+		TArray<AGridCell*> FindPath(AGridCell* StartCell, AGridCell* TargetCell, int32 DisplacementRange);
+
+		void HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacement);
+		void ResetHighlightedCells();
 
 	protected:
 		// Called when the game starts or when spawned
@@ -37,4 +41,6 @@ class UNREALPROJECT_API AGrid : public AActor {
 		UFUNCTION() void DetectObstacles(UWorld* world);
 		UPROPERTY() USceneComponent* GridRoot;
 		UPROPERTY() int32 CellSizeX = 170, CellSizeY = 200;
+
+		UFUNCTION() TArray<AGridCell*> GetNeighbors(AGridCell* Cell);
 };

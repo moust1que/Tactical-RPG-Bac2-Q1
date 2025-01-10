@@ -7,8 +7,8 @@ void AMageSkeleton::BeginPlay() {
 
     DisplacementRange = 4;
     AttackRange = 3;
-    Health = 50;
+    MaxHealth = 50;
+    Health = MaxHealth;
     Damage = 25;
-    Critical = 10;
     TurnSpeed = 22;
 }

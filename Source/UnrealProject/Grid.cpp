@@ -123,15 +123,6 @@ bool AGrid::IsPathAvailable(AGridCell* startCell, AGridCell* targetCell, int32 R
     inQueue.Add(startCell); // Ajouter la cellule de départ au suivi
 	startCell->DistanceFromStart = 0;
 
-    // int32 currentMoves = 0;
-
-    // Directions de déplacement possibles sur la grille hexagonale
-    static const FVector directions[6] = {
-        FVector(0, -1, 1), FVector(1,-1, 0),
-        FVector(1, 0, -1), FVector(0, 1, -1),
-        FVector(-1, 1, 0), FVector(-1, 0, 1)
-    };
-
 	int32 closestDistance = ManhattanDistanceOddR(startCell->X, startCell->Y, targetCell->X, targetCell->Y);
 
     while(!openList.IsEmpty()/* && currentMoves <= Range*/) {
@@ -145,26 +136,18 @@ bool AGrid::IsPathAvailable(AGridCell* startCell, AGridCell* targetCell, int32 R
         closedList.Add(currentCell);
 
         // Parcours des voisins de la cellule courante
-        for(const FVector& direction : directions) {
-            FVector neighborCube = OddRToCubic(currentCell->X, currentCell->Y) + direction;
-            int neighborX = neighborCube.X;
-            int neighborY = neighborCube.Y + FMath::FloorToInt(neighborCube.X / 2);
+        for(AGridCell* neighborCell : GetNeighbors(currentCell)) {
+			if(closedList.Contains(neighborCell) || !neighborCell->IsEmpty()) {
+				continue;
+			}
 
-            if(neighborX >= 0 && neighborX < GridSize && neighborY >= 0 && neighborY < GridSize) {
-                AGridCell* neighborCell = GridCells[neighborX * GridSize + neighborY];
+			int32 newDistance = currentCell->DistanceFromStart + 1;
 
-				if(closedList.Contains(neighborCell) || !neighborCell->IsEmpty()) {
-					continue;
-				}
-
-				int32 newDistance = currentCell->DistanceFromStart + 1;
-
-				if(newDistance <= Range && !inQueue.Contains(neighborCell)) {
-					neighborCell->DistanceFromStart = newDistance;
-					openList.Enqueue(neighborCell);
-                    inQueue.Add(neighborCell); // Ajouter à la liste des cellules en attente
-				}
-            }
+			if(newDistance <= Range && !inQueue.Contains(neighborCell)) {
+				neighborCell->DistanceFromStart = newDistance;
+				openList.Enqueue(neighborCell);
+				inQueue.Add(neighborCell); // Ajouter à la liste des cellules en attente
+			}
         }
     }
 	
@@ -185,6 +168,96 @@ int32 AGrid::ManhattanDistanceOddR(int32 x1, int32 y1, int32 x2, int32 y2) {
     );
 }
 
-double AGrid::euclideanDistance(int32 x1, int32 y1, int32 x2, int32 y2) {
-	return sqrt(FMath::Square(x1 - x2) + FMath::Square(y1 - y2));
+TArray<AGridCell*> AGrid::FindPath(AGridCell* StartCell, AGridCell* TargetCell, int32 DisplacementRange) {
+	TArray<AGridCell*> path;
+
+	TArray<AGridCell*> openList;
+	TSet<AGridCell*> closedList;
+
+	StartCell->GCost = 0;
+	StartCell->HCost = ManhattanDistanceOddR(StartCell->X, StartCell->Y, TargetCell->X, TargetCell->Y);
+	StartCell->Parent = nullptr;
+
+	openList.Add(StartCell);
+
+	while(!openList.IsEmpty()) {
+		openList.Sort([](const AGridCell& A, const AGridCell& B) {
+			return A.GetFCost() < B.GetFCost();
+		});
+
+		AGridCell* currentCell = openList[0];
+		
+		openList.RemoveAt(0);
+		closedList.Add(currentCell);
+
+		if(currentCell == TargetCell) {
+			
+			while(currentCell) {
+				path.Insert(currentCell, 0);
+				currentCell = currentCell->Parent;
+			}
+
+			return path;
+		}
+
+		for(AGridCell* neighborCell : GetNeighbors(currentCell)) {
+			if(!neighborCell || closedList.Contains(neighborCell) || !neighborCell->IsHighlighted() && !neighborCell->IsEmpty() && !(neighborCell == TargetCell)) {
+				continue;
+			}
+
+			int32 tentativeGCost = currentCell->GCost + 1;
+
+			if(!openList.Contains(neighborCell) || tentativeGCost < neighborCell->GCost) {
+				neighborCell->GCost = tentativeGCost;
+				neighborCell->HCost = ManhattanDistanceOddR(neighborCell->X, neighborCell->Y, TargetCell->X, TargetCell->Y);
+				neighborCell->Parent = currentCell;
+
+				if(!openList.Contains(neighborCell)) {
+					openList.Add(neighborCell);
+				}
+			}
+		}
+	}
+
+	return path;
+}
+
+TArray<AGridCell*> AGrid::GetNeighbors(AGridCell* Cell) {
+	TArray<AGridCell*> neighbors;
+
+	// Directions de déplacement possibles sur la grille hexagonale
+	static const FVector Directions[6] = {
+		FVector(0, -1, 1), FVector(1,-1, 0),
+		FVector(1, 0, -1), FVector(0, 1, -1),
+		FVector(-1, 1, 0), FVector(-1, 0, 1)
+	};
+
+	for(const FVector& direction : Directions) {
+		FVector neighborCube = OddRToCubic(Cell->X, Cell->Y) + direction;
+		int neighborX = neighborCube.X;
+		int neighborY = neighborCube.Y + FMath::FloorToInt(neighborCube.X / 2);
+
+		if(neighborX >= 0 && neighborX < GridSize && neighborY >= 0 && neighborY < GridSize) {
+			AGridCell* neighborCell = GridCells[neighborX * GridSize + neighborY];
+			neighbors.Add(neighborCell);
+		}
+	}
+
+	return neighbors;
+}
+
+void AGrid::HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacement) {
+    TArray<AGridCell*> CellsInRange = GetCellsInRange(CurCell, RemainingDisplacement);
+
+    for(AGridCell* cell : CellsInRange) {
+        cell->SetState(ECellState::Highlighted);
+    }
+}
+
+void AGrid::ResetHighlightedCells() {
+    for(AGridCell* cell : GridCells) {
+        if(cell->IsHighlighted()) {
+            cell->SetState(ECellState::Empty);
+        }
+    }
 }

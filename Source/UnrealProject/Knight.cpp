@@ -7,8 +7,8 @@ void AKnight::BeginPlay() {
     
     DisplacementRange = 4;
     AttackRange = 1;
-    Health = 120;
+    MaxHealth = 120;
+    Health = MaxHealth;
     Damage = 35;
-    Critical = 5;
     TurnSpeed = 25;
 }

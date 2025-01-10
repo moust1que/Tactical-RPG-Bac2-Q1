@@ -103,8 +103,13 @@ void AGridCell::OnMouseLeaveCell(UPrimitiveComponent* OverComponent) {
 
 void AGridCell::OnMouseClickOnCell(UPrimitiveComponent* ClickedComponent, FKey ButtonPressed) {
     ATacticalRPGGameMode* GameMode = Cast<ATacticalRPGGameMode>(GetWorld()->GetAuthGameMode());
-    if (GameMode->bPlacingUnits && CurrentState == ECellState::Highlighted) {
+    if(GameMode->bPlacingUnits && CurrentState == ECellState::Highlighted) {
         GameMode->HandleCellClick(this); // Notifie le GameMode
+    }else if(CurrentState == ECellState::Highlighted || CurrentState == ECellState::Empty || CurrentState == ECellState::OccupiedEnemy) {
+        APlayerUnit* playerUnit = Cast<APlayerUnit>(GameMode->AllUnits[0]);
+        if(playerUnit && (playerUnit->CurDisplacementUsed < playerUnit->DisplacementRange || playerUnit->bCanAttack)) {
+            playerUnit->HandleCellClick(this, (CurrentState == ECellState::OccupiedEnemy ? true : false));
+        }
     }
 }
 
@@ -121,39 +126,14 @@ void AGridCell::SetAsObstacle() {
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-TArray<AGridCell*> AGridCell::GetNeighborsOddR() {
-    TArray<AGridCell*> neighbors;
+void AGridCell::SetOccupant(ABaseCharacter* Occupant) {
+    OccupantCharacter = Occupant;
+}
 
-    Grid = GetWorld()->GetAuthGameMode<ATacticalRPGGameMode>()->Grid;
-    if(!Grid) {
-        UE_LOG(LogTemp, Error, TEXT("Grid is null!"));
-        return neighbors;
-    }
+ABaseCharacter* AGridCell::GetOccupant() {
+    return OccupantCharacter;
+}
 
-    int32 parity = Y & 1;
-    TArray<FVector2D> oddDirections[2] = {
-        {
-            FVector2D(1,  0), FVector2D( 0, 1), FVector2D(-1, 1),
-            FVector2D(-1,  0), FVector2D(-1, -1), FVector2D( 0, -1)
-        },
-        {
-            FVector2D(1,  0), FVector2D(1, 1), FVector2D( 0, 1),
-            FVector2D(-1,  0), FVector2D( 0, -1), FVector2D(1, -1)
-        }
-    };
-
-    for(const FVector2D& direction : oddDirections[parity]) {
-        if(X + direction.X < 0 || X + direction.X >= Grid->GridSize || Y + direction.Y < 0 || Y + direction.Y >= Grid->GridSize) {
-            continue;
-        }
-
-        AGridCell* neighborCell = Grid->GridCells[(X + direction.X) * Grid->GridSize + Y + direction.Y];
-        if(!neighborCell || !neighborCell->IsEmpty()) {
-            continue;
-        }
-
-        neighbors.Add(neighborCell);
-    }
-
-    return neighbors;
+int32 AGridCell::GetFCost() const {
+    return GCost + HCost;
 }

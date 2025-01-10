@@ -7,8 +7,8 @@ void ARogue::BeginPlay() {
 
     DisplacementRange = 6;
     AttackRange = 5;
-    Health = 80;
+    MaxHealth = 80;
+    Health = MaxHealth;
     Damage = 25;
-    Critical = 20;
     TurnSpeed = 12;
 }

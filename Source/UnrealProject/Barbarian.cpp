@@ -7,8 +7,8 @@ void ABarbarian::BeginPlay() {
 
     DisplacementRange = 5;
     AttackRange = 1;
-    Health = 150;
+    MaxHealth = 150;
+    Health = MaxHealth;
     Damage = 50;
-    Critical = 10;
     TurnSpeed = 30;
 }

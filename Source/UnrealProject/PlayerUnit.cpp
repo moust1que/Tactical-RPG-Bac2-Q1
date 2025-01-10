@@ -6,22 +6,42 @@ APlayerUnit::APlayerUnit() {
     bIsHero = true;
 }
 
-void APlayerUnit::TakeTurn(AGrid* Grid) {
-    HighlightCellsInRange(Grid);
+void APlayerUnit::TakeTurn(AGrid* GridRef) {
+    Grid = GridRef;
+    CurDisplacementUsed = 0;
+    bCanAttack = true;
+    remainingDisplacement = DisplacementRange;
+    Grid->HighlightCellsInRange(CurCell, DisplacementRange);
 }
 
-void APlayerUnit::HighlightCellsInRange(AGrid* Grid) {
-    TArray<AGridCell*> CellsInRange = Grid->GetCellsInRange(CurCell, DisplacementRange);
+void APlayerUnit::HandleCellClick(AGridCell* ClickedCell, bool bIsEnemy) {
+    TArray<AGridCell*> path = Grid->FindPath(CurCell, ClickedCell, DisplacementRange);
 
-    for(AGridCell* cell : CellsInRange) {
-        // if(cell->IsEmpty()) {
-            cell->SetState(ECellState::Highlighted);
-        // }
+    int32 pathLength = path.Num();
+
+    if(bIsEnemy) {
+        if(pathLength <= AttackRange) {
+            Attack(ClickedCell->GetOccupant());
+        }else if(pathLength > remainingDisplacement && pathLength <= remainingDisplacement + AttackRange) {
+            path.SetNum(pathLength - AttackRange + 1);
+            MoveAlongPath(path);
+            TargetToAttack = ClickedCell->GetOccupant();
+        }else if(pathLength > remainingDisplacement + AttackRange) {
+            path.SetNum(remainingDisplacement + 1);
+            MoveAlongPath(path);
+        }else if(pathLength <= remainingDisplacement) {
+            path.SetNum(pathLength - AttackRange + 1);
+            MoveAlongPath(path);
+            TargetToAttack = ClickedCell->GetOccupant();
+        }
+    }else {
+        if(pathLength > remainingDisplacement) {
+            path.SetNum(remainingDisplacement + 1);
+            MoveAlongPath(path);
+        }else {
+            MoveAlongPath(path);
+        }
     }
-}
 
-void APlayerUnit::HandleCellClick(AGridCell* ClickedCell) {
-    if(ClickedCell->IsEmpty()) {
-
-    }
+    remainingDisplacement = DisplacementRange - CurDisplacementUsed;
 }

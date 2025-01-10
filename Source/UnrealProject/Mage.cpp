@@ -7,8 +7,8 @@ void AMage::BeginPlay() {
 
     DisplacementRange = 5;
     AttackRange = 4;
-    Health = 70;
+    MaxHealth = 70;
+    Health = MaxHealth;
     Damage = 40;
-    Critical = 15;
     TurnSpeed = 18;
 }

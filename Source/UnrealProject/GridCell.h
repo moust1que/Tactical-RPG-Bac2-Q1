@@ -52,12 +52,18 @@ public:
 
     int32 X, Y;
 
-    UFUNCTION()
-    TArray<AGridCell*> GetNeighborsOddR();
-
     class AGrid* Grid;
 
     int32 DistanceFromStart;
+
+    void SetOccupant(class ABaseCharacter* Occupant);
+    class ABaseCharacter* GetOccupant();
+
+    int32 GCost;
+    int32 HCost;
+    UFUNCTION() int32 GetFCost() const;
+
+    AGridCell* Parent;
 
 protected:
     virtual void BeginPlay() override;
@@ -84,4 +90,6 @@ private:
     void OnMouseClickOnCell(UPrimitiveComponent* ClickedComponent, FKey ButtonPressed);
 
     void UpdateColorByState();
+
+    ABaseCharacter* OccupantCharacter;
 };
