@@ -11,6 +11,17 @@ ABaseCharacter::ABaseCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void ABaseCharacter::BeginPlay() {
+	Super::BeginPlay();
+
+	if(USkeletalMeshComponent* mesh = FindComponentByClass<USkeletalMeshComponent>()) {
+		if(UBaseCharacterAnimInstance* animInstance = Cast<UBaseCharacterAnimInstance>(mesh->GetAnimInstance())) {
+			UE_LOG(LogTemp, Warning, TEXT("AnimInstance found"));
+			AnimInstance = animInstance;
+		}
+	}
+}
+
 // Called to bind functionality to input
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -40,6 +51,8 @@ void ABaseCharacter::Die() {
 }
 
 void ABaseCharacter::MoveAlongPath(TArray<AGridCell*> path) {
+	AnimInstance->IsRunning = true;
+
     Grid->ResetHighlightedCells();
 
 	bIsMoving = true;
@@ -52,16 +65,6 @@ void ABaseCharacter::MoveAlongPath(TArray<AGridCell*> path) {
 
 	StartPosition = CurCell->GetActorLocation();
 	TargetPosition = path[CurrentCellIndex + 1]->GetActorLocation();
-
-	IsRunning = true;
-
-    // for(AGridCell* cell : path) {
-    //     cell->SetState(bIsHero ? ECellState::OccupiedHero : ECellState::OccupiedEnemy);
-    //     cell->SetOccupant(this);
-    //     CurCell->SetState(ECellState::Empty);
-    //     CurCell->SetOccupant(nullptr);
-    //     CurCell = cell;
-    // }
 }
 
 void ABaseCharacter::Tick(float DeltaTime) {
@@ -101,9 +104,8 @@ void ABaseCharacter::Tick(float DeltaTime) {
 			FVector CurrentPosition = FMath::Lerp(StartPosition, TargetPosition, alpha);
 			SetActorLocation(CurrentPosition);
 		}
-	}else if(IsRunning) {
-		IsRunning = false;
-		bIsMoving = false;
+	}else if(AnimInstance->IsRunning) {
+		AnimInstance->IsRunning = false;
 
 		if(remainingDisplacement > 0) {
 			Grid->HighlightCellsInRange(CurCell, remainingDisplacement);

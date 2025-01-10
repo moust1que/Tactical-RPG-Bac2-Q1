@@ -184,7 +184,6 @@ void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
         }
         
         unit->TurnProgress -= Unit->TurnProgress;
-        UE_LOG(LogTemp, Warning, TEXT("%s's turn progress: %d"), *unit->GetName(), unit->TurnProgress);
     }
     Unit->TurnProgress = Unit->TurnSpeed;
 }

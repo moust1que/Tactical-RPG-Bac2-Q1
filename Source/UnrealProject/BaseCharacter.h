@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GridCell.h"
+#include "BaseCharacterAnimInstance.h"
 #include "BaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, Health, float, MaxHealth);
@@ -27,6 +28,8 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 		AGridCell* CurCell;
 
 		AGrid* Grid;
+
+		UBaseCharacterAnimInstance* AnimInstance;
 
 		int32 TurnSpeed;
 		int32 TurnProgress;
@@ -63,10 +66,8 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 
 		bool bCanAttack = true;
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsRunning = false;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsAttacking = false;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsHit = false;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsDead = false;
+	protected:
+		virtual void BeginPlay() override;
 
 	private:
 		float ElapsedTime = 0.0f;
