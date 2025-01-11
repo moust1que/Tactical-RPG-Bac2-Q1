@@ -33,7 +33,6 @@ void ATacticalRPGGameMode::BeginPlay() {
     PlayerController = GetWorld()->GetFirstPlayerController();
 
     PlacingMenuWidget = CreateWidget<UUserWidget>(PlayerController, PlacingMenuWidgetClass);
-    BattleUIWidget = CreateWidget<UUserWidget>(PlayerController, BattleUIWidgetClass);
 
     SetGameState(EGameState::PlacingUnits);
 }
@@ -169,6 +168,8 @@ void ATacticalRPGGameMode::StartTurnSystem() {
     }
 
     SortUnitsBySpeed();
+    
+    BattleUIWidget = CreateWidget<UBattleUI>(PlayerController, BattleUIWidgetClass);
 
     ShowBattleUI();
 
@@ -190,5 +191,7 @@ void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
 
 void ATacticalRPGGameMode::RemoveUnit(ABaseCharacter* Unit) {
     AllUnits.Remove(Unit);
-    SortUnitsBySpeed();
+    // BattleUIWidget->UpdateTurnWidget();
+    // BattleUIWidget->UpdateTurnUI();
+    BattleUIWidget->CallUpdateTurnUI();
 }

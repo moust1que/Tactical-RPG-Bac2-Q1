@@ -15,6 +15,12 @@ void APlayerUnit::TakeTurn(AGrid* GridRef) {
 }
 
 void APlayerUnit::HandleCellClick(AGridCell* ClickedCell, bool bIsEnemy) {
+    if(AnimInstance->IsRunning || AnimInstance->IsAttacking) {
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("PlayerUnit::HandleCellClick"));
+
     TArray<AGridCell*> path = Grid->FindPath(CurCell, ClickedCell, DisplacementRange);
 
     int32 pathLength = path.Num();

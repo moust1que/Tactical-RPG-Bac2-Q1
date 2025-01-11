@@ -11,6 +11,7 @@
 #include "GridCell.h"
 #include "Blueprint/UserWidget.h"
 #include "BaseCharacter.h"
+#include "BattleUI.h"
 #include "TacticalRPGGameMode.generated.h"
 
 UENUM()
@@ -51,6 +52,7 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AGrid> GridRef;
 
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> PlacingMenuWidgetClass;
+		// UPROPERTY(EditAnywhere, Category = "Widget") /*TSubclassOf<UBattleUI>*/UBattleUI* BattleUIWidgetClass;
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> BattleUIWidgetClass;
 
 		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Knight;
@@ -70,7 +72,7 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UFUNCTION() void RegisterUnit(ABaseCharacter* Unit);
 		UFUNCTION() void RemoveUnit(ABaseCharacter* Unit);
 
-		UPROPERTY() AGrid* Grid;
+		UPROPERTY(BlueprintReadOnly) AGrid* Grid;
 
 		UFUNCTION(BlueprintCallable) void SortUnitsBySpeed();
 		UFUNCTION(BlueprintCallable) void StartTurnForUnit(ABaseCharacter* Unit);
@@ -86,7 +88,8 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY() TArray<AGridCell*> GridCells;
 
 		UPROPERTY() UUserWidget* PlacingMenuWidget;
-		UPROPERTY() UUserWidget* BattleUIWidget;
+		UPROPERTY() UBattleUI* BattleUIWidget;
+		// UPROPERTY() UUserWidget* BattleUIWidget;
 		UPROPERTY() TSubclassOf<APlayerUnit> CurrentUnitType;
 
 		void ShowPlacingMenu();

@@ -197,6 +197,8 @@ TArray<AGridCell*> AGrid::FindPath(AGridCell* StartCell, AGridCell* TargetCell, 
 				currentCell = currentCell->Parent;
 			}
 
+			UE_LOG(LogTemp, Warning, TEXT("Path length: %d"), path.Num());
+
 			return path;
 		}
 

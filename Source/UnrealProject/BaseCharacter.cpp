@@ -16,7 +16,6 @@ void ABaseCharacter::BeginPlay() {
 
 	if(USkeletalMeshComponent* mesh = FindComponentByClass<USkeletalMeshComponent>()) {
 		if(UBaseCharacterAnimInstance* animInstance = Cast<UBaseCharacterAnimInstance>(mesh->GetAnimInstance())) {
-			UE_LOG(LogTemp, Warning, TEXT("AnimInstance found"));
 			AnimInstance = animInstance;
 		}
 	}
@@ -41,7 +40,7 @@ void ABaseCharacter::ReveiveDamage(int32 DamageReceived) {
 }
 
 void ABaseCharacter::Die() {
-	UE_LOG(LogTemp, Warning, TEXT("%s is dead"), *GetName());
+	CurCell->SetState(ECellState::Empty);
 	Destroy();
 
 	ATacticalRPGGameMode* GameMode = Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()));

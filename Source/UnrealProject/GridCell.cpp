@@ -107,6 +107,7 @@ void AGridCell::OnMouseClickOnCell(UPrimitiveComponent* ClickedComponent, FKey B
         GameMode->HandleCellClick(this); // Notifie le GameMode
     }else if(CurrentState == ECellState::Highlighted || CurrentState == ECellState::Empty || CurrentState == ECellState::OccupiedEnemy) {
         APlayerUnit* playerUnit = Cast<APlayerUnit>(GameMode->AllUnits[0]);
+        UE_LOG(LogTemp, Warning, TEXT("PlayerUnit: %s"), *playerUnit->GetName());
         if(playerUnit && (playerUnit->CurDisplacementUsed < playerUnit->DisplacementRange || playerUnit->bCanAttack)) {
             playerUnit->HandleCellClick(this, (CurrentState == ECellState::OccupiedEnemy ? true : false));
         }

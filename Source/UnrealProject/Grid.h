@@ -30,7 +30,7 @@ class UNREALPROJECT_API AGrid : public AActor {
 		TArray<AGridCell*> FindPath(AGridCell* StartCell, AGridCell* TargetCell, int32 DisplacementRange);
 
 		void HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacement);
-		void ResetHighlightedCells();
+		UFUNCTION(BlueprintCallable) void ResetHighlightedCells();
 
 	protected:
 		// Called when the game starts or when spawned
