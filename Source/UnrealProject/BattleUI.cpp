@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "TurnOrderWidget.h"
 #include "BattleUI.h"
+#include "TurnOrderWidget.h"
 
 void UBattleUI::CallUpdateTurnUI() {
     if(WBP_TurnOrder) {
@@ -9,4 +9,8 @@ void UBattleUI::CallUpdateTurnUI() {
     }else {
         UE_LOG(LogTemp, Warning, TEXT("TurnOrderWidget is not set!"));
     }
+}
+
+void UBattleUI::EndTurn() {
+    OnEndTurn.Broadcast();
 }

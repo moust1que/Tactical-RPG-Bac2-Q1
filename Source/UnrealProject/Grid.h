@@ -27,10 +27,12 @@ class UNREALPROJECT_API AGrid : public AActor {
 		bool IsPathAvailable(AGridCell* startCell, AGridCell* targetCell, int32 Range);
 		int32 ManhattanDistanceOddR(int32 x1, int32 y1, int32 x2, int32 y2);
 
-		TArray<AGridCell*> FindPath(AGridCell* StartCell, AGridCell* TargetCell, int32 DisplacementRange);
+		TArray<AGridCell*> FindPath(AGridCell* StartCell, AGridCell* TargetCell);
 
 		void HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacement);
 		UFUNCTION(BlueprintCallable) void ResetHighlightedCells();
+
+		UFUNCTION() TArray<AGridCell*> GetNeighbors(AGridCell* Cell);
 
 	protected:
 		// Called when the game starts or when spawned
@@ -41,6 +43,4 @@ class UNREALPROJECT_API AGrid : public AActor {
 		UFUNCTION() void DetectObstacles(UWorld* world);
 		UPROPERTY() USceneComponent* GridRoot;
 		UPROPERTY() int32 CellSizeX = 170, CellSizeY = 200;
-
-		UFUNCTION() TArray<AGridCell*> GetNeighbors(AGridCell* Cell);
 };

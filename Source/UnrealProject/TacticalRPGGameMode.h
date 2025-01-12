@@ -52,8 +52,9 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AGrid> GridRef;
 
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> PlacingMenuWidgetClass;
-		// UPROPERTY(EditAnywhere, Category = "Widget") /*TSubclassOf<UBattleUI>*/UBattleUI* BattleUIWidgetClass;
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> BattleUIWidgetClass;
+		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> VictoryWidgetClass;
+		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> DefeatWidgetClass;
 
 		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Knight;
 		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Rogue;
@@ -77,6 +78,14 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 		UFUNCTION(BlueprintCallable) void SortUnitsBySpeed();
 		UFUNCTION(BlueprintCallable) void StartTurnForUnit(ABaseCharacter* Unit);
 
+		UPROPERTY() UUserWidget* PlacingMenuWidget;
+		UPROPERTY() UBattleUI* BattleUIWidget;
+		UPROPERTY() UUserWidget* VictoryWidget;
+		UPROPERTY() UUserWidget* DefeatWidget;
+
+		void Defeat();
+		void Victory();
+
 	private:
 		void HandleGameStateChange(EGameState NewGameState);
 
@@ -87,8 +96,6 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 
 		UPROPERTY() TArray<AGridCell*> GridCells;
 
-		UPROPERTY() UUserWidget* PlacingMenuWidget;
-		UPROPERTY() UBattleUI* BattleUIWidget;
 		// UPROPERTY() UUserWidget* BattleUIWidget;
 		UPROPERTY() TSubclassOf<APlayerUnit> CurrentUnitType;
 

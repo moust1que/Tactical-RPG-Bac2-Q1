@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "BattleUI.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndTurn);
+
 UCLASS()
 class UNREALPROJECT_API UBattleUI : public UUserWidget {
 	GENERATED_BODY()
@@ -15,4 +17,8 @@ class UNREALPROJECT_API UBattleUI : public UUserWidget {
 
 	public:
 		UFUNCTION(BlueprintCallable) void CallUpdateTurnUI();
+
+		UPROPERTY(BlueprintAssignable, Category = "BattleUI") FEndTurn OnEndTurn;
+
+		void EndTurn();
 };

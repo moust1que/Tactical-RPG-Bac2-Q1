@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BaseCharacter.h"
-#include "TacticalRPGGameMode.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Grid.h"
+#include "TacticalRPGGameMode.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter() {
@@ -19,6 +20,8 @@ void ABaseCharacter::BeginPlay() {
 			AnimInstance = animInstance;
 		}
 	}
+
+	Grid = Cast<AGrid>(UGameplayStatics::GetActorOfClass(GetWorld(), AGrid::StaticClass()));
 }
 
 // Called to bind functionality to input
@@ -26,35 +29,36 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseCharacter::TakeTurn(AGrid* GridRef) {}
+void ABaseCharacter::TakeTurn() {}
 
 void ABaseCharacter::ReveiveDamage(int32 DamageReceived) {
-	Health -= DamageReceived;
+	Health -= DamageReceived + FMath::FloorToInt((LastAttacker->CurLevel - 1) * 0.2f * DamageReceived);
+
+	AnimInstance->IsHit = true;
+
+	FTimerHandle HitTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(HitTimerHandle, [this]() {
+		AnimInstance->IsHit = false;
+	}, 1.0f, false);
 
 	// Déclenche l'événement OnHealthChanged
     OnHealthChanged.Broadcast(Health, MaxHealth);
 
 	if(Health <= 0) {
-		Die();
-	}
-}
-
-void ABaseCharacter::Die() {
-	CurCell->SetState(ECellState::Empty);
-	Destroy();
-
-	ATacticalRPGGameMode* GameMode = Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if(GameMode) {
-		GameMode->RemoveUnit(this);
+		OnDeath();
 	}
 }
 
 void ABaseCharacter::MoveAlongPath(TArray<AGridCell*> path) {
+	UE_LOG(LogTemp, Warning, TEXT("MoveAlongPath"));
+
+	if(remainingDisplacement <= 0) {
+		return;
+	}
+
 	AnimInstance->IsRunning = true;
 
     Grid->ResetHighlightedCells();
-
-	bIsMoving = true;
 
     CurDisplacementUsed += path.Num() - 1;
 
@@ -63,7 +67,7 @@ void ABaseCharacter::MoveAlongPath(TArray<AGridCell*> path) {
 	ElapsedTime = 0.0f;
 
 	StartPosition = CurCell->GetActorLocation();
-	TargetPosition = path[CurrentCellIndex + 1]->GetActorLocation();
+	TargetPosition = Path[CurrentCellIndex + 1]->GetActorLocation();
 }
 
 void ABaseCharacter::Tick(float DeltaTime) {
@@ -103,15 +107,19 @@ void ABaseCharacter::Tick(float DeltaTime) {
 			FVector CurrentPosition = FMath::Lerp(StartPosition, TargetPosition, alpha);
 			SetActorLocation(CurrentPosition);
 		}
-	}else if(AnimInstance->IsRunning) {
-		AnimInstance->IsRunning = false;
 
-		if(remainingDisplacement > 0) {
-			Grid->HighlightCellsInRange(CurCell, remainingDisplacement);
+		if(CurCell == Path[Path.Num() - 1] && AnimInstance->IsRunning) {
+			AnimInstance->IsRunning = false;
+
+			if(!bIsHero && !bWillAttack) {
+				ATacticalRPGGameMode* gameMode = Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+				gameMode->BattleUIWidget->EndTurn();
+				bWillAttack = true;
+			}else if(bIsHero && CurDisplacementUsed > 0) {
+				Grid->HighlightCellsInRange(CurCell, remainingDisplacement);
+			}
 		}
-	}
-
-	if(CurrentCellIndex >= Path.Num() - 1 && TargetToAttack != nullptr) {
+	}else if(CurrentCellIndex >= Path.Num() - 1 && TargetToAttack != nullptr) {
 		Attack(TargetToAttack);
 		TargetToAttack = nullptr;
 	}
@@ -128,6 +136,8 @@ void ABaseCharacter::MoveToCell(AGridCell* NextCell) {
 void ABaseCharacter::Attack(ABaseCharacter* Target) {
     if(Target && bCanAttack) {
         bCanAttack = false;
+
+		AnimInstance->IsAttacking = true;
         
 		FVector direction = Target->GetActorLocation() - GetActorLocation();
 		direction.Z = 0.0f;
@@ -135,6 +145,61 @@ void ABaseCharacter::Attack(ABaseCharacter* Target) {
 		FRotator targetRotation = direction.Rotation() - FRotator(0.0f, 90.0f, 0.0f);
 		SetActorRotation(targetRotation);
 
+		Target->LastAttacker = this;
+
         Target->ReveiveDamage(Damage);
+
+		FTimerHandle AttackTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, [this]() {
+			AnimInstance->IsAttacking = false;
+
+			if(!bIsHero) {
+				ATacticalRPGGameMode* gameMode = Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+				gameMode->BattleUIWidget->EndTurn();
+			}
+		}, 1.0f, false);
     }
+}
+
+void ABaseCharacter::ResetRange() {
+	Grid->ResetHighlightedCells();
+    if(remainingDisplacement > 0) {
+        Grid->HighlightCellsInRange(CurCell, remainingDisplacement);
+    }
+}
+
+void ABaseCharacter::OnDeath() {
+	AnimInstance->IsDead = true;
+
+	UWidgetComponent* HealthBarWidget = Cast<UWidgetComponent>(GetDefaultSubobjectByName(TEXT("HealthBar")));
+	HealthBarWidget->SetVisibility(false);
+
+	CurCell->SetState(ECellState::Empty);
+
+	ATacticalRPGGameMode* gameMode = Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if(gameMode) {
+		gameMode->RemoveUnit(this);
+	}
+
+	LastAttacker->GiveXP();
+	LastAttacker->ResetRange();
+
+	FTimerHandle DeathTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DeathTimerHandle, [this]() {
+		Destroy();
+	}, 3.0f, false);
+}
+
+void ABaseCharacter::GiveXP() {
+    XP += 60;
+
+    while(XP >= XPForNextLevel) {
+        XP -= XPForNextLevel;
+        XPForNextLevel = FMath::FloorToInt(XPForNextLevel * 1.2f);
+        CurLevel++;
+    }
+
+    OnXPChanged.Broadcast(XP, XPForNextLevel);
+	UE_LOG(LogTemp, Warning, TEXT("Level up"));
 }

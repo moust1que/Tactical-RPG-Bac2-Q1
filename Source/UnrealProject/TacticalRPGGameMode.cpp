@@ -24,9 +24,7 @@ void ATacticalRPGGameMode::BeginPlay() {
     }
 
     PlaceUnit(RogueSkeleton, false, GridCells[133]);
-    // PlaceUnit(RogueSkeleton, false, GridCells[63]);
-    // PlaceUnit(MageSkeleton, false, GridCells[14]);
-    PlaceUnit(MageSkeleton, false, GridCells[63]);
+    PlaceUnit(MageSkeleton, false, GridCells[14]);
     PlaceUnit(MinionSkeleton, false, GridCells[208]);
     PlaceUnit(WarriorSkeleton, false, GridCells[103]);
 
@@ -177,7 +175,7 @@ void ATacticalRPGGameMode::StartTurnSystem() {
 }
 
 void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
-    Unit->TakeTurn(Grid);
+    Unit->TakeTurn();
 
     for(ABaseCharacter* unit : AllUnits) {
         if(unit == Unit) {
@@ -191,7 +189,23 @@ void ATacticalRPGGameMode::StartTurnForUnit(ABaseCharacter* Unit) {
 
 void ATacticalRPGGameMode::RemoveUnit(ABaseCharacter* Unit) {
     AllUnits.Remove(Unit);
-    // BattleUIWidget->UpdateTurnWidget();
-    // BattleUIWidget->UpdateTurnUI();
     BattleUIWidget->CallUpdateTurnUI();
+}
+
+void ATacticalRPGGameMode::Defeat() {
+    DefeatWidget = CreateWidget<UUserWidget>(PlayerController, DefeatWidgetClass);
+    DefeatWidget->AddToViewport();
+
+    FInputModeUIOnly inputModeData;
+    inputModeData.SetWidgetToFocus(DefeatWidget->TakeWidget());
+    PlayerController->SetInputMode(inputModeData);
+}
+
+void ATacticalRPGGameMode::Victory() {
+    VictoryWidget = CreateWidget<UUserWidget>(PlayerController, VictoryWidgetClass);
+    VictoryWidget->AddToViewport();
+
+    FInputModeUIOnly inputModeData;
+    inputModeData.SetWidgetToFocus(VictoryWidget->TakeWidget());
+    PlayerController->SetInputMode(inputModeData);
 }

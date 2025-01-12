@@ -168,7 +168,7 @@ int32 AGrid::ManhattanDistanceOddR(int32 x1, int32 y1, int32 x2, int32 y2) {
     );
 }
 
-TArray<AGridCell*> AGrid::FindPath(AGridCell* StartCell, AGridCell* TargetCell, int32 DisplacementRange) {
+TArray<AGridCell*> AGrid::FindPath(AGridCell* StartCell, AGridCell* TargetCell) {
 	TArray<AGridCell*> path;
 
 	TArray<AGridCell*> openList;
@@ -191,13 +191,10 @@ TArray<AGridCell*> AGrid::FindPath(AGridCell* StartCell, AGridCell* TargetCell, 
 		closedList.Add(currentCell);
 
 		if(currentCell == TargetCell) {
-			
 			while(currentCell) {
 				path.Insert(currentCell, 0);
 				currentCell = currentCell->Parent;
 			}
-
-			UE_LOG(LogTemp, Warning, TEXT("Path length: %d"), path.Num());
 
 			return path;
 		}
@@ -249,6 +246,7 @@ TArray<AGridCell*> AGrid::GetNeighbors(AGridCell* Cell) {
 }
 
 void AGrid::HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacement) {
+	UE_LOG(LogTemp, Warning, TEXT("HighlightCellsInRange for cell %d, %d"), CurCell->X, CurCell->Y);
     TArray<AGridCell*> CellsInRange = GetCellsInRange(CurCell, RemainingDisplacement);
 
     for(AGridCell* cell : CellsInRange) {
@@ -257,6 +255,7 @@ void AGrid::HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacemen
 }
 
 void AGrid::ResetHighlightedCells() {
+	UE_LOG(LogTemp, Warning, TEXT("ResetHighlightedCells"));
     for(AGridCell* cell : GridCells) {
         if(cell->IsHighlighted()) {
             cell->SetState(ECellState::Empty);

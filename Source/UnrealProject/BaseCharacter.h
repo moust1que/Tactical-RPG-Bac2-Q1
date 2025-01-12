@@ -9,6 +9,7 @@
 #include "BaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, Health, float, MaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnXPChanged, float, XP, float, XPForNextLevel);
 
 UCLASS()
 class UNREALPROJECT_API ABaseCharacter : public APawn {
@@ -22,14 +23,14 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 		virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 		UFUNCTION()
-		virtual void TakeTurn(AGrid* GridRef);
+		virtual void TakeTurn();
 		
 		bool bIsHero;
-		AGridCell* CurCell;
+		UPROPERTY(EditAnywhere) AGridCell* CurCell;
 
-		AGrid* Grid;
+		class AGrid* Grid;
 
-		UBaseCharacterAnimInstance* AnimInstance;
+		UPROPERTY(BlueprintReadOnly) UBaseCharacterAnimInstance* AnimInstance;
 
 		int32 TurnSpeed;
 		int32 TurnProgress;
@@ -51,20 +52,33 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 		// Delegate pour notifier des changements de santé
 		UPROPERTY(BlueprintAssignable, Category = "Health")
 		FOnHealthChanged OnHealthChanged;
-
-		void Die();
+		UPROPERTY(BlueprintAssignable, Category = "XP")
+		FOnXPChanged OnXPChanged;
 
 		virtual void Tick(float DeltaTime) override;
 
 		TArray<AGridCell*> Path;
 
-		bool bIsMoving = false;
+		bool bWillAttack = true;
 
 		ABaseCharacter* TargetToAttack = nullptr;
 
 		void Attack(ABaseCharacter* Enemy);
 
 		bool bCanAttack = true;
+
+		void OnDeath();
+		void HandleDeathSpecifics();
+
+		ABaseCharacter* LastAttacker;
+
+		virtual void GiveXP();
+
+		int32 XP = 0;
+		int32 XPForNextLevel = 100;
+		int32 CurLevel = 1;
+
+		void ResetRange();
 
 	protected:
 		virtual void BeginPlay() override;

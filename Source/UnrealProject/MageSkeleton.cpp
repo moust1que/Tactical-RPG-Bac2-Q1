@@ -6,7 +6,7 @@ void AMageSkeleton::BeginPlay() {
     Super::BeginPlay();
 
     DisplacementRange = 4;
-    AttackRange = 3;
+    AttackRange = 5;
     MaxHealth = 50;
     Health = MaxHealth;
     Damage = 25;

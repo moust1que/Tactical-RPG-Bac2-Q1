@@ -1,13 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerUnit.h"
+#include "TacticalRPGGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayerUnit::APlayerUnit() {
     bIsHero = true;
 }
 
-void APlayerUnit::TakeTurn(AGrid* GridRef) {
-    Grid = GridRef;
+void APlayerUnit::TakeTurn() {
     CurDisplacementUsed = 0;
     bCanAttack = true;
     remainingDisplacement = DisplacementRange;
@@ -19,14 +20,14 @@ void APlayerUnit::HandleCellClick(AGridCell* ClickedCell, bool bIsEnemy) {
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("PlayerUnit::HandleCellClick"));
+    TArray<AGridCell*> path = Grid->FindPath(CurCell, ClickedCell);
 
-    TArray<AGridCell*> path = Grid->FindPath(CurCell, ClickedCell, DisplacementRange);
+    int32 pathLength = path.Num() - 1;
 
-    int32 pathLength = path.Num();
+    int32 directDistance = Grid->ManhattanDistanceOddR(CurCell->X, CurCell->Y, ClickedCell->X, ClickedCell->Y);
 
     if(bIsEnemy) {
-        if(pathLength <= AttackRange) {
+        if(directDistance <= AttackRange) {
             Attack(ClickedCell->GetOccupant());
         }else if(pathLength > remainingDisplacement && pathLength <= remainingDisplacement + AttackRange) {
             path.SetNum(pathLength - AttackRange + 1);
@@ -36,7 +37,7 @@ void APlayerUnit::HandleCellClick(AGridCell* ClickedCell, bool bIsEnemy) {
             path.SetNum(remainingDisplacement + 1);
             MoveAlongPath(path);
         }else if(pathLength <= remainingDisplacement) {
-            path.SetNum(pathLength - AttackRange + 1);
+            path.SetNum(pathLength);
             MoveAlongPath(path);
             TargetToAttack = ClickedCell->GetOccupant();
         }

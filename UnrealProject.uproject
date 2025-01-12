@@ -10,9 +10,7 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"EnhancedInput",
-				"UMGEditor",
-				"UMG"
+				"EnhancedInput"
 			]
 		}
 	],

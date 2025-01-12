@@ -15,4 +15,8 @@ class UNREALPROJECT_API AEnemyUnit : public ABaseCharacter {
 
 	public:
 		AEnemyUnit();
+
+		void TakeTurn() override;
+
+		class APlayerUnit* FindClosestPlayer(TArray<ABaseCharacter*> AllUnits);
 };

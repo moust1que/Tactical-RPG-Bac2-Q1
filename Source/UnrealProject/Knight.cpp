@@ -6,7 +6,7 @@ void AKnight::BeginPlay() {
     Super::BeginPlay();
     
     DisplacementRange = 4;
-    AttackRange = 1;
+    AttackRange = 2;
     MaxHealth = 120;
     Health = MaxHealth;
     Damage = 35;

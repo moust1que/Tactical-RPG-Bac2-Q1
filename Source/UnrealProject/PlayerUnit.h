@@ -22,5 +22,5 @@ class UNREALPROJECT_API APlayerUnit : public ABaseCharacter {
 		UFUNCTION()
 		void HandleCellClick(AGridCell* ClickedCell, bool bIsEnemy);
 
-		void TakeTurn(AGrid* GridRef) override;
+		void TakeTurn() override;
 };
