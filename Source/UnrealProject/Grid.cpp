@@ -246,19 +246,19 @@ TArray<AGridCell*> AGrid::GetNeighbors(AGridCell* Cell) {
 }
 
 void AGrid::HighlightCellsInRange(AGridCell* CurCell, int32 RemainingDisplacement) {
-	UE_LOG(LogTemp, Warning, TEXT("HighlightCellsInRange for cell %d, %d"), CurCell->X, CurCell->Y);
     TArray<AGridCell*> CellsInRange = GetCellsInRange(CurCell, RemainingDisplacement);
 
     for(AGridCell* cell : CellsInRange) {
-        cell->SetState(ECellState::Highlighted);
+	    cell->SetState(ECellState::Highlighted);
+		cell->HoverColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
     }
 }
 
 void AGrid::ResetHighlightedCells() {
-	UE_LOG(LogTemp, Warning, TEXT("ResetHighlightedCells"));
     for(AGridCell* cell : GridCells) {
         if(cell->IsHighlighted()) {
             cell->SetState(ECellState::Empty);
+			cell->HoverColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f);
         }
     }
 }

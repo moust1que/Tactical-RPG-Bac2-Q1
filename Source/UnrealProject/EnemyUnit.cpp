@@ -52,7 +52,7 @@ void AEnemyUnit::TakeTurn() {
         MoveAlongPath(path);
     } else if (pathLength <= remainingDisplacement) {
         // Si peut se déplacer entièrement et attaquer
-        path.SetNum(pathLength);
+        path.SetNum(pathLength - AttackRange + 1);
         MoveAlongPath(path);
         TargetToAttack = targetPlayer;
     }
@@ -62,7 +62,7 @@ void AEnemyUnit::TakeTurn() {
 
     // FTimerHandle EndTurnTimerHandle;
     // GetWorld()->GetTimerManager().SetTimer(EndTurnTimerHandle, [this]() {
-    //     Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->BattleUIWidget->EndTurn();
+        // Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->BattleUIWidget->EndTurn();
     // }, 6.0f, false);
 }
 

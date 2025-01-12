@@ -37,7 +37,7 @@ void APlayerUnit::HandleCellClick(AGridCell* ClickedCell, bool bIsEnemy) {
             path.SetNum(remainingDisplacement + 1);
             MoveAlongPath(path);
         }else if(pathLength <= remainingDisplacement) {
-            path.SetNum(pathLength);
+            path.SetNum(pathLength - AttackRange + 1);
             MoveAlongPath(path);
             TargetToAttack = ClickedCell->GetOccupant();
         }

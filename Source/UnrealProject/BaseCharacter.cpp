@@ -50,8 +50,6 @@ void ABaseCharacter::ReveiveDamage(int32 DamageReceived) {
 }
 
 void ABaseCharacter::MoveAlongPath(TArray<AGridCell*> path) {
-	UE_LOG(LogTemp, Warning, TEXT("MoveAlongPath"));
-
 	if(remainingDisplacement <= 0) {
 		return;
 	}
@@ -189,6 +187,24 @@ void ABaseCharacter::OnDeath() {
 	GetWorld()->GetTimerManager().SetTimer(DeathTimerHandle, [this]() {
 		Destroy();
 	}, 3.0f, false);
+
+	CheckIfEnemyStillAlive();
+}
+
+void ABaseCharacter::CheckIfEnemyStillAlive() {
+	int32 aliveEnemiesUnits = 0;
+
+	ATacticalRPGGameMode* gameMode = Cast<ATacticalRPGGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	
+	for(ABaseCharacter* unit : gameMode->AllUnits) {
+		if(!unit->bIsHero) {
+			aliveEnemiesUnits++;
+		}
+	}
+
+	if(aliveEnemiesUnits == 0) {
+		gameMode->Victory();
+	}
 }
 
 void ABaseCharacter::GiveXP() {

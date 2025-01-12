@@ -80,6 +80,8 @@ class UNREALPROJECT_API ABaseCharacter : public APawn {
 
 		void ResetRange();
 
+		void CheckIfEnemyStillAlive();
+
 	protected:
 		virtual void BeginPlay() override;
 

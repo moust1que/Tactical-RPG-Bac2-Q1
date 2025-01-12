@@ -92,7 +92,7 @@ void AGridCell::UpdateColorByState() {
 
 // Gestion des événements de la souris
 void AGridCell::OnMouseOverCell(UPrimitiveComponent* OverComponent) {
-    if (CurrentState == ECellState::Empty || CurrentState == ECellState::Highlighted) {
+    if (IsEmpty() || IsHighlighted()) {
         SetColor(HoverColor);
     }
 }
