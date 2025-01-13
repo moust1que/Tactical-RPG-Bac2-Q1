@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Barbarian.h"
 
 void ABarbarian::BeginPlay() {
     Super::BeginPlay();
 
+    // On initialise les statistiques du Barbarian
     DisplacementRange = 5;
     AttackRange = 1;
     MaxHealth = 150;

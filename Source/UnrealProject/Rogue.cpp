@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Rogue.h"
 
 void ARogue::BeginPlay() {
     Super::BeginPlay();
 
+    // On initialise les statistiques du Rogue
     DisplacementRange = 6;
     AttackRange = 5;
     MaxHealth = 80;

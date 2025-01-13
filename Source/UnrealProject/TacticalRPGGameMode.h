@@ -1,27 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
-#include "TacticalRPGPlayerController.h"
-#include "PlayerUnit.h"
-#include "EnemyUnit.h"
-#include "Grid.h"
-#include "GridCell.h"
-#include "Blueprint/UserWidget.h"
-#include "BaseCharacter.h"
-#include "BattleUI.h"
 #include "TacticalRPGGameMode.generated.h"
 
+// Etats du jeu
 UENUM()
 enum class EGameState : uint8 {
 	Starting,
 	PlacingUnits,
-	PlayPhase,
-	EndPhase
+	PlayPhase
 };
 
+// Types de personnages
 UENUM()
 enum class EUnitType : uint8 {
     Knight,
@@ -36,79 +27,106 @@ class UNREALPROJECT_API ATacticalRPGGameMode : public AGameMode {
 
 	protected:
 		void BeginPlay() override;
-		EGameState CurrentGameState;
 
 	public:
+		// Constructeur
 		ATacticalRPGGameMode();
 
+		// Defini l'etat du jeu
 		UFUNCTION(BlueprintCallable)
 		void SetGameState(EGameState NewGameState);
 
+		// Defini le type de personnage a placer
 		UFUNCTION(BlueprintCallable)
 		void SelectUnitToSpawn(EUnitType UnitType);
+
+		// Gere le clic sur une cellule
 		UFUNCTION()
 		void HandleCellClick(AGridCell* ClickedCell);
 
-		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<AGrid> GridRef;
+		// Reference de la classe de la grille
+		UPROPERTY(EditAnywhere, Category = "Grid") TSubclassOf<class AGrid> GridRef;
 
+		// Reference des classes des widgets
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> PlacingMenuWidgetClass;
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> BattleUIWidgetClass;
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> VictoryWidgetClass;
 		UPROPERTY(EditAnywhere, Category = "Widget") TSubclassOf<UUserWidget> DefeatWidgetClass;
 
-		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Knight;
-		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Rogue;
-		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Mage;
-		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<APlayerUnit> Barbarian;
+		// Reference des classes des personnages
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<class APlayerUnit> Knight;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<class APlayerUnit> Rogue;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<class APlayerUnit> Mage;
+		UPROPERTY(EditAnywhere, Category = "Heros") TSubclassOf<class APlayerUnit> Barbarian;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<class AEnemyUnit> RogueSkeleton;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<class AEnemyUnit> MageSkeleton;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<class AEnemyUnit> MinionSkeleton;
+		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<class AEnemyUnit> WarriorSkeleton;
 
-		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> RogueSkeleton;
-		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> MageSkeleton;
-		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> MinionSkeleton;
-		UPROPERTY(EditAnywhere, Category = "Enemies") TSubclassOf<AEnemyUnit> WarriorSkeleton;
+		// Tableau contenant tous les personnages en jeu
+		UPROPERTY(BlueprintReadWrite) TArray<class ABaseCharacter*> AllUnits;
 
-		UPROPERTY(BlueprintReadWrite) TArray<ABaseCharacter*> AllUnits;
-
+		// Booleen indiquant si le placement des personnages est en cours
 		UPROPERTY() bool bPlacingUnits = false;
 
-		UFUNCTION() void RegisterUnit(ABaseCharacter* Unit);
-		UFUNCTION() void RemoveUnit(ABaseCharacter* Unit);
+		// Fonction permettant d'enregistrer un nouveau personnage
+		UFUNCTION() void RegisterUnit(class ABaseCharacter* Unit);
 
+		// Fonction permettant de supprimer un personnage
+		UFUNCTION() void RemoveUnit(class ABaseCharacter* Unit);
+
+		// Reference de la grille
 		UPROPERTY(BlueprintReadOnly) AGrid* Grid;
 
+		// Fonction permettant de trier les personnages par vitesse
 		UFUNCTION(BlueprintCallable) void SortUnitsBySpeed();
-		UFUNCTION(BlueprintCallable) void StartTurnForUnit(ABaseCharacter* Unit);
 
+		// Fonction permettant de commencer le tour d'un personnage
+		UFUNCTION(BlueprintCallable) void StartTurnForUnit(class ABaseCharacter* Unit);
+
+		// Reference des widgets
 		UPROPERTY() UUserWidget* PlacingMenuWidget;
-		UPROPERTY() UBattleUI* BattleUIWidget;
+		UPROPERTY() class UBattleUI* BattleUIWidget;
 		UPROPERTY() UUserWidget* VictoryWidget;
 		UPROPERTY() UUserWidget* DefeatWidget;
 
+		// Fonctions de fin de partie
 		void Defeat();
 		void Victory();
 
 	private:
+		// Fonction permettant de gerer le changement d'etat du jeu
 		void HandleGameStateChange(EGameState NewGameState);
 
+		// Reference du player controller
 		UPROPERTY() APlayerController* PlayerController;
 
+		// Nombre d'unites placees
 		UPROPERTY() int32 UnitsPlaced = 0;
+
+		// Nombre d'unites maximales que le joueur peut placer
 		UPROPERTY() int32 MaxUnits = 4;
 
+		// Tableau des cellules composant la grille
 		UPROPERTY() TArray<AGridCell*> GridCells;
 
-		// UPROPERTY() UUserWidget* BattleUIWidget;
+		// Type de personnage en cours de placement
 		UPROPERTY() TSubclassOf<APlayerUnit> CurrentUnitType;
 
+		// Fonction D'affichage du menu de placement de personnages
 		void ShowPlacingMenu();
+		// Fonction permettantr de cacher le menu de placement de personnages
 		void HidePlacingMenu();
 
+		// Fonction permettant d'afficher l'UI de combat
 		void ShowBattleUI();
-		void HideBattleUI();
+
+		// Fonction permettant de commencer le systeme de tour
 		void StartTurnSystem();
 
-		void PlaceUnit(TSubclassOf<ABaseCharacter> UnitTypeToSpawn, bool bIsHero, AGridCell* CellToSpawnOn);
+		// Fonction permettant de placer un personnage
+		void PlaceUnit(TSubclassOf<class ABaseCharacter> UnitTypeToSpawn, bool bIsHero, AGridCell* CellToSpawnOn);
 
-		UPROPERTY() bool bCombatActive = true;
-
-		void EndGame();
+		// Etat actuel du jeu
+		EGameState CurrentGameState;
 };

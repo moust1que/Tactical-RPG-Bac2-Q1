@@ -1,24 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "TacticalRPGPlayerController.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
+#include "FreeCamera.h"
 
 void ATacticalRPGPlayerController::BeginPlay() {
     Super::BeginPlay();
 
+    // parametrages du player controller
     bShowMouseCursor = true;
     bEnableMouseOverEvents = true;
     bEnableClickEvents = true;
-    
-    // SetInputMode(FInputModeGameAndUI());
 
     if(ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player)) {
         if(UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) {
-            if(!IMC_CameraControl.IsNull()){
-                InputSubsystem->AddMappingContext(IMC_CameraControl.LoadSynchronous(), 0);
-                CurrentInputMappingContext = IMC_CameraControl;
-            }else {
-                UE_LOG(LogTemp, Warning, TEXT("IMC_CameraControl is missing in BP_TacticalRPGPlayerController"));
-            }
+            // Ajout du mapping context
+            InputSubsystem->AddMappingContext(IMC_CameraControl.LoadSynchronous(), 0);
         }
     }
 }
@@ -27,6 +25,7 @@ void ATacticalRPGPlayerController::SetupInputComponent() {
     Super::SetupInputComponent();
 
     if(InputComponent) {
+        // Initialisation de la gestion dynamique des inputs
         SetupInputHandling(InputComponent);
     }
 }
@@ -38,12 +37,14 @@ void ATacticalRPGPlayerController::SetupInputHandling(UInputComponent* PlayerInp
 
     for(UInputAction* action : InputActions) {
         if(action) {
+            // Pour chaque action, on la lie a la fonction DynamicInputHandler
             Input->BindAction(action, ETriggerEvent::Triggered, this, &ATacticalRPGPlayerController::DynamicInputHandler);
         }
     }
 }
 
 void ATacticalRPGPlayerController::DynamicInputHandler(const FInputActionInstance& Instance) {
+    // Cette fonction appelle la fonction reliee au nom de l'action dans ActionFunctionMapping
     FName actionName = Instance.GetSourceAction()->GetFName();
 
     if(ActionFunctionMapping.Contains(actionName)) {

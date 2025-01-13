@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Knight.h"
 
 void AKnight::BeginPlay() {
     Super::BeginPlay();
     
+    // On initialise les statistiques du Knight
     DisplacementRange = 4;
     AttackRange = 1;
     MaxHealth = 120;

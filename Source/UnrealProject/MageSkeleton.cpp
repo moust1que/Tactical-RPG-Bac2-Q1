@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "MageSkeleton.h"
 
 void AMageSkeleton::BeginPlay() {
     Super::BeginPlay();
 
+    // On initialise les statistiques du Mage Skeleton
     DisplacementRange = 4;
     AttackRange = 5;
     MaxHealth = 50;

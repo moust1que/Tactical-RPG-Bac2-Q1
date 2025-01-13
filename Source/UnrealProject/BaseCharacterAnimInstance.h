@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,6 +9,7 @@ class UNREALPROJECT_API UBaseCharacterAnimInstance : public UAnimInstance {
 	GENERATED_BODY()
 	
 	public:
+		// Booleens permettant de jouer les animations des personnages
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsRunning;
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsAttacking;
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flags") bool IsHit;

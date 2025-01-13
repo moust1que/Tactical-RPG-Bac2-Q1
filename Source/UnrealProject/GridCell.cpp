@@ -1,58 +1,52 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "GridCell.h"
 #include "TacticalRPGGameMode.h"
+#include "PlayerUnit.h"
 
-// Sets default values
 AGridCell::AGridCell() {
     PrimaryActorTick.bCanEverTick = false;
 
+    // On active les collisions
     SetActorEnableCollision(true);
 
+    // On definis les composants qui composent la cellule
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
     MeshComponent->SetupAttachment(RootComponent);
 
+    // Parametrage des collisions et des events
     MeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     MeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
     MeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECollisionResponse::ECR_Block);
     MeshComponent->SetGenerateOverlapEvents(true);
-
     MeshComponent->OnBeginCursorOver.AddDynamic(this, &AGridCell::OnMouseOverCell);
     MeshComponent->OnEndCursorOver.AddDynamic(this, &AGridCell::OnMouseLeaveCell);
     MeshComponent->OnClicked.AddDynamic(this, &AGridCell::OnMouseClickOnCell);
 
-    InitialColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f); // Blanc par défaut
+    InitialColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f); // Blanc par defaut
 }
 
-// Called when the game starts or when spawned
 void AGridCell::BeginPlay() {
     Super::BeginPlay();
 
-    if (!CellMesh) {
-        UE_LOG(LogTemp, Error, TEXT("CellMesh is null! Assign a valid mesh in the editor or Blueprint."));
-        return;
-    }
-
+    // Parametrage de la cellule
     MeshComponent->SetStaticMesh(CellMesh);
 	MeshComponent->SetRelativeRotation(FRotator(0.0f, 30.0f, 0.0f));
 
-    if (BaseMaterial) {
+    if(BaseMaterial) {
         DynamicMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
-        if (DynamicMaterial) {
+        if(DynamicMaterial) {
+            // On applique l'instance du materiel
             MeshComponent->SetMaterial(0, DynamicMaterial);
+            
+            // On met a jour la couleur
             UpdateColorByState();
         }
     }
 }
 
-// Called every frame (non utilisé pour l'instant)
-void AGridCell::Tick(float DeltaTime) {
-    Super::Tick(DeltaTime);
-}
-
-// Change l'état de la cellule et met à jour la couleur
+// Change l'etat de la cellule et met a jour la couleur
 void AGridCell::SetState(ECellState NewState) {
     CurrentState = NewState;
     UpdateColorByState();
@@ -66,7 +60,7 @@ bool AGridCell::IsHighlighted() {
 	return CurrentState == ECellState::Highlighted;
 }
 
-// Met à jour la couleur en fonction de l'état actuel
+// Met a jour la couleur en fonction de l'etat actuel
 void AGridCell::UpdateColorByState() {
     if (!DynamicMaterial) return;
 
@@ -90,50 +84,62 @@ void AGridCell::UpdateColorByState() {
     }
 }
 
-// Gestion des événements de la souris
+// Fonction quand la souris survole la cellule
 void AGridCell::OnMouseOverCell(UPrimitiveComponent* OverComponent) {
-    if (IsEmpty() || IsHighlighted()) {
+    if(IsEmpty() || IsHighlighted()) {
+        // On met la couleur du hover si la cellules est vide ou mise en surbrillance
         SetColor(HoverColor);
     }
 }
 
+// Fonction quand la souris quitte la cellule
 void AGridCell::OnMouseLeaveCell(UPrimitiveComponent* OverComponent) {
-    UpdateColorByState(); // Retour à la couleur d'état
+    // Retour a la couleur d'etat
+    UpdateColorByState();
 }
 
+// Fonction quand la souris clique sur la cellule
 void AGridCell::OnMouseClickOnCell(UPrimitiveComponent* ClickedComponent, FKey ButtonPressed) {
     ATacticalRPGGameMode* GameMode = Cast<ATacticalRPGGameMode>(GetWorld()->GetAuthGameMode());
+
     if(GameMode->bPlacingUnits && CurrentState == ECellState::Highlighted) {
-        GameMode->HandleCellClick(this); // Notifie le GameMode
+        // Si le GameMode est en mode placement de unite et que la cellule est mise en surbrillance, on notifie le GameMode que la cellule a ete cliquee
+        GameMode->HandleCellClick(this);
     }else if(CurrentState == ECellState::Highlighted || CurrentState == ECellState::Empty || CurrentState == ECellState::OccupiedEnemy) {
+        // Si la cellule est mise en surbrillance ou vide ou occupee par un ennemi, on notifie l'unite dont c'est le tour que la cellule a ete cliquee
         APlayerUnit* playerUnit = Cast<APlayerUnit>(GameMode->AllUnits[0]);
+
         if(playerUnit && (playerUnit->CurDisplacementUsed < playerUnit->DisplacementRange || playerUnit->bCanAttack)) {
             playerUnit->HandleCellClick(this, (CurrentState == ECellState::OccupiedEnemy ? true : false));
         }
     }
 }
 
-// Change directement la couleur
+// Fonction pour modifier la couleur de la cellule
 void AGridCell::SetColor(FLinearColor Color) {
     if (DynamicMaterial) {
         DynamicMaterial->SetVectorParameterValue(TEXT("CellColor"), Color);
     }
 }
 
-// Définit une cellule comme un obstacle
+// Definit une cellule comme un obstacle
 void AGridCell::SetAsObstacle() {
     SetState(ECellState::Obstacle);
+    // On desactive la collision
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+// On definit le personnages occupant la cellule
 void AGridCell::SetOccupant(ABaseCharacter* Occupant) {
     OccupantCharacter = Occupant;
 }
 
+// On retourne le personnages occupant la cellule
 ABaseCharacter* AGridCell::GetOccupant() {
     return OccupantCharacter;
 }
 
+// On retourne le cout total de la cellule
 int32 AGridCell::GetFCost() const {
     return GCost + HCost;
 }

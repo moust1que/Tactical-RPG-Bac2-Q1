@@ -5,6 +5,7 @@
 void ARogueSkeleton::BeginPlay() {
     Super::BeginPlay();
 
+    // On initialise les statistiques du Rogue Skeleton
     DisplacementRange = 5;
     AttackRange = 4;
     MaxHealth = 60;

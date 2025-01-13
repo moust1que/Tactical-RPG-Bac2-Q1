@@ -5,6 +5,7 @@
 void AMage::BeginPlay() {
     Super::BeginPlay();
 
+    // On initialise les statistiques du Mage
     DisplacementRange = 5;
     AttackRange = 4;
     MaxHealth = 70;

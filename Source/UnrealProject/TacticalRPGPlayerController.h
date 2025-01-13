@@ -1,15 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
-#include "InputMappingContext.h"
-#include "InputAction.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "FreeCamera.h"
 #include "TacticalRPGPlayerController.generated.h"
 
 UCLASS()
@@ -17,10 +10,13 @@ class UNREALPROJECT_API ATacticalRPGPlayerController : public APlayerController 
 	GENERATED_BODY()
 
 	public:
-		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<UInputMappingContext> IMC_CameraControl;
-		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<UInputMappingContext> IMC_UnitControl;
+		// Mapping context de controle de la camera
+		UPROPERTY(EditAnywhere, Category = "Input") TSoftObjectPtr<class UInputMappingContext> IMC_CameraControl;
 
-		UPROPERTY(EditAnywhere, Category = "Input") TArray<UInputAction*> InputActions = {};
+		// Input Actions de la camera
+		UPROPERTY(EditAnywhere, Category = "Input") TArray<class UInputAction*> InputActions = {};
+
+		// Nom des actions et des fonctions correspondantes
 		UPROPERTY(EditAnywhere, Category = "Input") TMap<FName, FName> ActionFunctionMapping = {};
 
 	protected:
@@ -28,8 +24,9 @@ class UNREALPROJECT_API ATacticalRPGPlayerController : public APlayerController 
 		virtual void SetupInputComponent() override;
 
 	private:
+		// Fonction de gestion dynamique des inputs actions
 		void DynamicInputHandler(const FInputActionInstance& Instance);
-		void SetupInputHandling(UInputComponent* PlayerInputComponent);
 
-		TSoftObjectPtr<UInputMappingContext> CurrentInputMappingContext;
+		// Fonction de setup des inputs actions
+		void SetupInputHandling(class UInputComponent* PlayerInputComponent);
 };

@@ -1,7 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "TurnOrderWidget.h"
 #include "TacticalRPGGameMode.h"
+#include "Components/Image.h"
+#include "BaseCharacter.h"
 
 void UTurnOrderWidget::UpdateTurnUI() {
     for(int32 i = 0; i <= 7; i++) {
