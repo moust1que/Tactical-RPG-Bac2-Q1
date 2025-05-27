@@ -83,7 +83,7 @@
 
 ### 🧩 Features
 
-- hexagonal Grid-based movement system for units
+- Hexagonal grid-based movement system for units
 - Turn-based system with initiative
 - Melee and ranged attacks
 - User interface for stats and actions
